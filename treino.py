@@ -2,6 +2,12 @@ import json
 from itertools import islice
 import urllib.request
 
+import numpy as np
+import pandas as pd 
+import matplotlib
+
+from sklearn.cluster import KMeans
+
 
 def conecta_api():
 
@@ -26,13 +32,26 @@ def carrega_dados(limit):
 
 	for dado in dados[:limit]:
 		print(dado)
-		matriz.append( [ dado['device_id'], dado['mac'], dado['s'], dado['t'], dado['d'] ])
+		# matriz.append( [ dado['device_id'], dado['mac'], dado['s'], dado['t'], dado['d'] ])
+		matriz.append( [ dado['d'] ])
+
 	
 	return matriz
+
+
+def executa_kmeans(matriz_dados):
+	
+	print(matriz_dados)
+	
+	kmeans = KMeans(n_clusters = 3, init = 'random')
+
+	print( kmeans.fit(matriz_dados) )
+
+	print ('Klusters selecionados: \n' , kmeans.cluster_centers_ )
 
 
 
 
 matriz_dados = carrega_dados(10)
 
-print(matriz_dados)
+executa_kmeans(matriz_dados)
