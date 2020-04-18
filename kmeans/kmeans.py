@@ -4,18 +4,20 @@ import matplotlib
 
 from sklearn.cluster import KMeans
 
-dataset=pd.read_csv('Mall_Customers.csv')
+dataset=pd.read_json('data.json')
 dataset.describe()
 
-X = dataset.iloc[:, [3, 4]].values
+print(dataset.device_id)
 
-kmeans = KMeans(n_clusters = 3, init = 'random')
+# X = dataset.iloc[:, [3, 4]].values
+
+# kmeans = KMeans(n_clusters = 3, init = 'random')
 
 
-print( kmeans.fit(X) )
+# print( kmeans.fit(X) )
 
 
-print (kmeans.cluster_centers_ )
+# print (kmeans.cluster_centers_ )
 
-# print(X)
+# # print(X)
 

@@ -4,10 +4,10 @@ import urllib.request
 
 import numpy as np
 import pandas as pd 
-import matplotlib
+import matplotlib as plt
 
 from sklearn.cluster import KMeans
-
+from sklearn.neighbors import KNeighborsClassifier
 
 def conecta_api():
 
@@ -28,21 +28,22 @@ def carrega_dados(limit):
 
 	dados = conecta_api()
 
+	dataFrame =  pd.DataFrame.from_dict(dados)
+
+	classes = np.array(dataFrame.device_id);
+
 	matriz = []
+	for dado in dados:
+		matriz.append( [float(dado['s']),  float(dado['d']) ])
+		
+	# print(np.array(dataFrame.drop( ['device_id','mac', 't'],  1)))
 
-	for dado in dados[:limit]:
-		print(dado)
-		# matriz.append( [ dado['device_id'], dado['mac'], dado['s'], dado['t'], dado['d'] ])
-		matriz.append( [ dado['d'] ])
+	return matriz, classes
+	# return  np.array(dataFrame.drop( ['device_id', 's','mac', 't'],  1)), classes
 
 	
-	return matriz
-
-
 def executa_kmeans(matriz_dados):
-	
-	print(matriz_dados)
-	
+		
 	kmeans = KMeans(n_clusters = 3, init = 'random')
 
 	print( kmeans.fit(matriz_dados) )
@@ -51,7 +52,21 @@ def executa_kmeans(matriz_dados):
 
 
 
+def executa_knn(matriz_dados, classes):
 
-matriz_dados = carrega_dados(10)
+	knn = KNeighborsClassifier(n_neighbors=3) 
 
-executa_kmeans(matriz_dados)
+	print(knn.fit(matriz_dados, classes))
+
+	print(knn.predict([[-59, 1575630298428]]))
+
+
+
+
+
+ 
+matriz_dados, classes = carrega_dados(10)
+
+
+executa_knn(matriz_dados, classes)
+
