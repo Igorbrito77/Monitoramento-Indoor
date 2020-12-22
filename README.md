@@ -6,6 +6,16 @@ Implementação de um programa que gera pacotes com endereço MAC forjado para a
 Execução 
 ----
 
+Deixar a placa em modo monitor: 
+---
+
+* airmon-ng check
+* airmon-ng check kill
+* airmon-ng start wlp3s0
+* /etc/init.d/network-manager restart
+* airmon-ng stop wlp3s0mon
+
+
 * Executar o arquivo script.py : python script.py
 
 
