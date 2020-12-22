@@ -9,7 +9,6 @@ Mudar para root para a execução dos seguintes comandos.
 
 
 ### Deixar a placa em modo monitor: 
----
 
 * Verifica quais processos precisam ser interrompidos: **airmon-ng check**
 * Encerra os processos:  **airmon-ng check kill**
@@ -23,6 +22,5 @@ Mudar para root para a execução dos seguintes comandos.
 
 
 ## Teste da geração de pacotes
-------
 
 * Executar o arquivo pacotes_beacon.py : **python pacotes_beacon.py**
