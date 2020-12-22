@@ -5,7 +5,7 @@ Implementação de um programa que gera pacotes com endereço MAC forjado para a
 
 ## Execução 
 
-* Mudar para root para a execução dos seguintes comandos. **(sudo su no terminal do linux)** 
+* Mudar para root para a execução dos seguintes comandos. (**"sudo su"** no terminal do linux)** 
 * Alterar o valor das varáveis no arquivo **script.py** de acordo com as configurações da sua rede wireless.
 
 ### Deixar a placa em modo monitor: 
