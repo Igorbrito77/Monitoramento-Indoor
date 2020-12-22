@@ -5,6 +5,9 @@ Implementação de um programa que gera pacotes com endereço MAC forjado para a
 
 ## Execução 
 
+Mudar para root para a execução dos seguintes comandos. 
+
+
 ### Deixar a placa em modo monitor: 
 ---
 
@@ -12,8 +15,9 @@ Implementação de um programa que gera pacotes com endereço MAC forjado para a
 * Encerra os processos:  **airmon-ng check kill**
 * Deixa a placa wireless em modo monitor: **airmon-ng start nome_da_placa_wireless**
 * Religar o wifi caso tenha sido desligado ao ativar o modo monitor:  **/etc/init.d/network-manager restart**
-* Encerrar o modo monitor na placa wireless : **airmon-ng stop nome_da_placa_wireless**
+* Encerrar o modo monitor na placa wireless : **airmon-ng stop nome_da_placa_wireless_em_modo_monitor**
 
+### Execução da geração de pacotes
 
 * Executar o arquivo script.py : **python script.py**
 
