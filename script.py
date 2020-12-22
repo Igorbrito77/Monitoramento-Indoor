@@ -1,10 +1,11 @@
 from scapy.all import Dot11,Dot11Beacon,Dot11Elt,RadioTap,sendp,hexdump
+# import hashlib
 
 
-def geracao_pacotes(nome_pr_criptografado):
+def geracao_pacotes():
 
-	netSSID = 'testSSID' #Network name here
-	iface = 'wlp3s0mon'   #Nome da Interface
+	netSSID = 'testSSID' 
+	iface = 'wlp3s0mon'   #Nome da Interface Wireless
 
 
 	## addr1 = MAC de destino (MAC da placa wireless)
@@ -43,15 +44,24 @@ def geracao_pacotes(nome_pr_criptografado):
 
 
 
-def criptografa_nome_pr(nome_pr):
+def criptografa_nome_pr():
+
+	# nome_pr = raw_input('Digite o nome do Ponto de Referencia: ')
+
+	# h = hashlib.md5()
+	# h.update(nome_pr)
+	# nome_pr_hex = h.hexdigest()
+	# print(nome_pr_hex)
+
 	pass
 
 
 def main():
-	nome_pr = raw_input('Digite o nome do Ponto de Referencia: ')
-	nome_pr_criptografado = criptografa_nome_pr(nome_pr)
+	# nome_pr_criptografado = criptografa_nome_pr()
+	# geracao_pacotes(nome_pr_criptografado)
 
-	geracao_pacotes(nome_pr_criptografado)
+	geracao_pacotes()
+
 
 
 main()
