@@ -1,8 +1,8 @@
 from scapy.all import Dot11,Dot11Beacon,Dot11Elt,RadioTap,sendp,hexdump
-# import hashlib
+import zlib
 
 
-def geracao_pacotes():
+def geracao_pacotes(mac_forjado_pr):
 
 	netSSID = 'testSSID' 
 	iface = 'wlp3s0mon'   #Nome da Interface Wireless
@@ -12,8 +12,7 @@ def geracao_pacotes():
 	## addr2 = Endereco MAC de origem do remetente. (MAC forjado)
 	## addr3 = Endereco MAC do ponto de acesso.
 
-	# dot11 = Dot11(type=0, subtype=8, addr1='E4:18:6B:4B:94:00', addr2=nome_pr_criptografado, addr3='33:33:33:33:33:33')
-	dot11 = Dot11(type=0, subtype=8, addr1='E4:18:6B:4B:94:00', addr2='22:22:22:22:22:22', addr3='33:33:33:33:33:33')
+	dot11 = Dot11(type=0, subtype=8, addr1='E4:18:6B:4B:94:00', addr2=mac_forjado_pr, addr3='33:33:33:33:33:33')
 
 
 	beacon = Dot11Beacon(cap='ESS+privacy') ## indica a capacidade do ponto de acesso
@@ -46,21 +45,25 @@ def geracao_pacotes():
 
 def criptografa_nome_pr():
 
-	# nome_pr = raw_input('Digite o nome do Ponto de Referencia: ')
+	prefixo = '0000'
 
-	# h = hashlib.md5()
-	# h.update(nome_pr)
-	# nome_pr_hex = h.hexdigest()
-	# print(nome_pr_hex)
+	nome_pr = raw_input('Digite o nome do Ponto de Referencia: ')
 
-	pass
+	sufixo = hex( zlib.crc32(nome_pr) % (1<<32))
+
+	print 'Sufixo: '+  sufixo
+
+	hash_nome_pr = prefixo + sufixo.replace('0x', '')
+
+	mac_forjado = ':'.join(s.encode('hex') for s in hash_nome_pr.decode('hex'))
+	print 'Endereco MAC forjado: ' + mac_forjado	
+
+	return mac_forjado
 
 
 def main():
-	# nome_pr_criptografado = criptografa_nome_pr()
-	# geracao_pacotes(nome_pr_criptografado)
-
-	geracao_pacotes()
+	mac_forjado_pr = criptografa_nome_pr()
+	geracao_pacotes(mac_forjado_pr)
 
 
 
