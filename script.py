@@ -14,7 +14,6 @@ def geracao_pacotes(mac_forjado_pr):
 
 	dot11 = Dot11(type=0, subtype=8, addr1='E4:18:6B:4B:94:00', addr2=mac_forjado_pr, addr3='33:33:33:33:33:33')
 
-
 	beacon = Dot11Beacon(cap='ESS+privacy') ## indica a capacidade do ponto de acesso
 
 	essid = Dot11Elt(ID='SSID',info=netSSID, len=len(netSSID))
@@ -37,13 +36,14 @@ def geracao_pacotes(mac_forjado_pr):
 
 	hexdump(frame)
 
+	print '\n\n____________________________________________________\n'
 	raw_input("Digite enter para o inicio do envio de pacotes:")
 
 	sendp(frame, iface=iface, inter=0.100, loop=1) # inter = intervalo entre o envio dos pacotes
 
 
 
-def criptografa_nome_pr():
+def criacao_mac_ponto_referencia():
 
 	prefixo = '0000'
 
@@ -51,18 +51,23 @@ def criptografa_nome_pr():
 
 	sufixo = hex( zlib.crc32(nome_pr) % (1<<32))
 
-	print 'Sufixo: '+  sufixo
 
 	hash_nome_pr = prefixo + sufixo.replace('0x', '')
 
 	mac_forjado = ':'.join(s.encode('hex') for s in hash_nome_pr.decode('hex'))
-	print 'Endereco MAC forjado: ' + mac_forjado	
+
+
+	print '\n____________________________________________________\n'
+	print 'Sufixo: '+  sufixo
+	print '\nEndereco MAC forjado: ' + mac_forjado
+	print '\n____________________________________________________\n'
+	
 
 	return mac_forjado
 
 
 def main():
-	mac_forjado_pr = criptografa_nome_pr()
+	mac_forjado_pr = criacao_mac_ponto_referencia()
 	geracao_pacotes(mac_forjado_pr)
 
 
