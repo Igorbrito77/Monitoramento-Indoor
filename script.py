@@ -7,6 +7,8 @@ def geracao_pacotes(mac_forjado_pr):
 	netSSID = 'testSSID' 
 	iface = 'wlp3s0mon'   #Nome da Interface Wireless
 
+	num_pacotes = int(raw_input("Insira o numero de pacotes a serem enviados: "))
+	intervalo_envio = float(raw_input("Insira o intervalo de frequencia de envio de pacotes (em segundos) : "))
 
 	## addr1 = MAC de destino (MAC da placa wireless)
 	## addr2 = Endereco MAC de origem do remetente. (MAC forjado)
@@ -39,7 +41,8 @@ def geracao_pacotes(mac_forjado_pr):
 	print '\n\n____________________________________________________\n'
 	raw_input("Digite enter para o inicio do envio de pacotes:")
 
-	sendp(frame, iface=iface, inter=0.100, loop=1) # inter = intervalo entre o envio dos pacotes
+
+	sendp(frame, iface=iface, inter=intervalo_envio, loop=0, count=num_pacotes) # inter = intervalo entre o envio dos pacotes
 
 
 
