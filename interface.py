@@ -76,7 +76,7 @@ class Application:
 		self.botao_inicio["text"] = "Iniciar"
 		self.botao_inicio["font"] = ("Calibri", "8")
 		self.botao_inicio["width"] = 12
-		self.botao_inicio["command"] = self.geracao_pacotes
+		self.botao_inicio["command"] = self.enviar_pacotes
 		self.botao_inicio.pack()
 
 
@@ -90,8 +90,12 @@ class Application:
 		# self.autenticar["command"] = self.verificaSenha
 		# self.autenticar.pack()
 
-		# self.mensagem = Label(self.quartoContainer, text="", font=self.fontePadrao)
-		# self.mensagem.pack()
+
+
+		########################################  MENSAGEM DE EXCECAO:
+
+		self.mensagem = Label(self.quartoContainer, text="", font=self.fontePadrao)
+		self.mensagem.pack()
 
 	#Metodo verificar senha
 	# def verificaSenha(self):
@@ -101,6 +105,26 @@ class Application:
 	# 		self.mensagem["text"] = "Autenticado"
 	# 	else:
 	# 		self.mensagem["text"] = "Erro na autenticacao"
+
+	def enviar_pacotes(self):
+
+		ponto_referencia = self.ponto_referencia.get()
+		numero_pacotes = 	self.numero_pacotes.get()
+		intervalo_envio = self.intervalo.get()
+
+		if ponto_referencia == "":
+			self.mensagem["text"] = "Insira o nome do Ponto de Referencia"
+			return
+
+		if numero_pacotes == "":
+			self.mensagem["text"] = "Insira o numero de pacotes"
+			return
+
+		if intervalo_envio == "":
+			self.mensagem["text"] = "Insira o interevalo de envio"
+			return
+
+		self.geracao_pacotes()
 
 	def criacao_mac_ponto_referencia(self):
 
@@ -116,10 +140,10 @@ class Application:
 		mac_forjado = ':'.join(s.encode('hex') for s in hash_nome_pr.decode('hex'))
 
 
-		# print '\n____________________________________________________\n'
-		# print 'Sufixo: '+  sufixo
-		# print '\nEndereco MAC forjado: ' + mac_forjado
-		# print '\n____________________________________________________\n'
+		print '\n____________________________________________________\n'
+		print 'Sufixo: '+  sufixo
+		print '\nEndereco MAC forjado: ' + mac_forjado
+		print '\n____________________________________________________\n'
 		
 
 		return mac_forjado
@@ -161,11 +185,14 @@ class Application:
 
 		hexdump(frame)
 
-		print '\n\n____________________________________________________\n'
-		raw_input("Digite enter para o inicio do envio de pacotes:")
+		# print '\n\n____________________________________________________\n'
+		# raw_input("Digite enter para o inicio do envio de pacotes:")
 
 
-		sendp(frame, iface=iface, inter=intervalo_envio, loop=0, count=numero_pacotes) # inter = intervalo entre o envio dos pacotes
+		a = sendp(frame, iface=iface, inter=intervalo_envio, loop=0, count=numero_pacotes) # inter = intervalo entre o envio dos pacotes
+		print(a)
+
+		self.primeiroContainer.quit()
 
 
 
