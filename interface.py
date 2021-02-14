@@ -30,19 +30,16 @@ class Application:
 
 		self.titulo = Label(self.primeiroContainer, text="Monitoramento Indoor")
 		self.titulo["font"] = ("Arial", "10", "bold")
-		self.titulo.pack()
 
 
 		########################################  PONTO DE REFERENCIA:
 
 
 		self.ponto_referencia_label = Label(self.segundoContainer,text="Nome do Ponto de Referencia", font=self.fontePadrao)
-		self.ponto_referencia_label.pack(side=LEFT)
 
 		self.ponto_referencia = Entry(self.segundoContainer)
-		self.ponto_referencia["width"] = 30
+		self.ponto_referencia["width"] = 10
 		self.ponto_referencia["font"] = self.fontePadrao
-		self.ponto_referencia.pack(side=LEFT)
 
 
 
@@ -50,24 +47,20 @@ class Application:
 
 
 		self.numero_pacotes_label = Label(self.terceiroContainer,text="Numero de pacotes", font=self.fontePadrao)
-		self.numero_pacotes_label.pack(side=LEFT)
 
 		self.numero_pacotes = Entry(self.terceiroContainer)
 		self.numero_pacotes["width"] = 30
 		self.numero_pacotes["font"] = self.fontePadrao
-		self.numero_pacotes.pack(side=LEFT)
 
 
 		########################################  INETERVALO DE ENVIO:
 
 
 		self.intervalo_label = Label(self.terceiroContainer, text="Intervalo de envio", font=self.fontePadrao)
-		self.intervalo_label.pack(side=LEFT)
 
 		self.intervalo = Entry(self.terceiroContainer)
 		self.intervalo["width"] = 30
 		self.intervalo["font"] = self.fontePadrao
-		self.intervalo.pack(side=LEFT)
 
 
 		########################################  BOTAO DE INICIO:
@@ -77,40 +70,34 @@ class Application:
 		self.botao_inicio["font"] = ("Calibri", "8")
 		self.botao_inicio["width"] = 12
 		self.botao_inicio["command"] = self.enviar_pacotes
-		self.botao_inicio.pack()
 
 
 		########################################  BOTAO DE PARAR:
 
 
-		# self.autenticar = Button(self.quintoContainer)
-		# self.autenticar["text"] = "nao ta pronto kkkk"
-		# self.autenticar["font"] = ("Calibri", "8")
-		# self.autenticar["width"] = 12
-		# self.autenticar["command"] = self.verificaSenha
-		# self.autenticar.pack()
+		self.botao_reinicio = Button(self.quintoContainer)
+		self.botao_reinicio["text"] = "Reiniciar"
+		self.botao_reinicio["font"] = ("Calibri", "8")
+		self.botao_reinicio["width"] = 12
+		self.botao_reinicio["command"] = self.iniciar_tela
+		# self.botao_reinicio.pack()
 
 
 
 		########################################  MENSAGEM DE EXCECAO:
 
 		self.mensagem = Label(self.quartoContainer, text="", font=self.fontePadrao)
-		self.mensagem.pack()
 
-	#Metodo verificar senha
-	# def verificaSenha(self):
-	# 	usuario = self.numero_pacotes.get()
-	# 	senha = self.senha.get()
-	# 	if usuario == "usuariodevmedia" and senha == "dev":
-	# 		self.mensagem["text"] = "Autenticado"
-	# 	else:
-	# 		self.mensagem["text"] = "Erro na autenticacao"
 
+		self.iniciar_tela()
+
+	
 	def enviar_pacotes(self):
 
 		ponto_referencia = self.ponto_referencia.get()
-		numero_pacotes = 	self.numero_pacotes.get()
+		numero_pacotes = self.numero_pacotes.get()
 		intervalo_envio = self.intervalo.get()
+
 
 		if ponto_referencia == "":
 			self.mensagem["text"] = "Insira o nome do Ponto de Referencia"
@@ -121,10 +108,37 @@ class Application:
 			return
 
 		if intervalo_envio == "":
-			self.mensagem["text"] = "Insira o interevalo de envio"
+			self.mensagem["text"] = "Insira o intervalo de envio"
 			return
 
 		self.geracao_pacotes()
+
+	def iniciar_tela(self):
+
+		self.botao_reinicio.pack_forget()
+
+		self.titulo.pack()
+		self.ponto_referencia_label.pack(side=LEFT)
+		self.ponto_referencia.pack(side=LEFT)
+		self.numero_pacotes_label.pack(side=LEFT)
+		self.numero_pacotes.pack(side=LEFT)
+		self.intervalo_label.pack(side=LEFT)
+		self.intervalo.pack(side=LEFT)
+		self.botao_inicio.pack()
+		self.mensagem.pack()
+
+
+	def atualizar_tela(self):
+
+		self.botao_inicio.pack_forget()
+		self.ponto_referencia.pack_forget()
+		self.ponto_referencia_label.pack_forget()
+		self.numero_pacotes.pack_forget()
+		self.numero_pacotes_label.pack_forget()
+		self.intervalo.pack_forget()
+		self.intervalo_label.pack_forget()
+
+		self.botao_reinicio.pack(side=BOTTOM)
 
 	def criacao_mac_ponto_referencia(self):
 
@@ -185,14 +199,12 @@ class Application:
 
 		hexdump(frame)
 
-		# print '\n\n____________________________________________________\n'
-		# raw_input("Digite enter para o inicio do envio de pacotes:")
-
-
 		a = sendp(frame, iface=iface, inter=intervalo_envio, loop=0, count=numero_pacotes) # inter = intervalo entre o envio dos pacotes
 		print(a)
 
-		self.primeiroContainer.quit()
+
+		self.atualizar_tela()
+		# self.primeiroContainer.quit()
 
 
 
