@@ -42,6 +42,11 @@ class Application:
 		self.ponto_referencia["font"] = self.fontePadrao
 
 
+		########################################  MAC FORJADO :
+
+		self.mac_forjado_pr = "";
+		self.mac_forjado_pr_label = Label(self.terceiroContainer,text="MAC forjado:", font=self.fontePadrao)
+
 
 		########################################  NUMERO DE PACOTES:
 
@@ -93,52 +98,67 @@ class Application:
 
 	
 	def enviar_pacotes(self):
+		self.criacao_mac_ponto_referencia()
+		self.atualizar_tela()
+		# ponto_referencia = self.ponto_referencia.get()
+		# numero_pacotes = self.numero_pacotes.get()
+		# intervalo_envio = self.intervalo.get()
 
-		ponto_referencia = self.ponto_referencia.get()
-		numero_pacotes = self.numero_pacotes.get()
-		intervalo_envio = self.intervalo.get()
 
+		# if ponto_referencia == "":
+		# 	self.mensagem["text"] = "Insira o nome do Ponto de Referencia"
+		# 	return
 
-		if ponto_referencia == "":
-			self.mensagem["text"] = "Insira o nome do Ponto de Referencia"
-			return
+		# if numero_pacotes == "":
+		# 	self.mensagem["text"] = "Insira o numero de pacotes"
+		# 	return
 
-		if numero_pacotes == "":
-			self.mensagem["text"] = "Insira o numero de pacotes"
-			return
+		# if intervalo_envio == "":
+		# 	self.mensagem["text"] = "Insira o intervalo de envio"
+		# 	return
 
-		if intervalo_envio == "":
-			self.mensagem["text"] = "Insira o intervalo de envio"
-			return
-
-		self.geracao_pacotes()
+		# self.geracao_pacotes()
 
 	def iniciar_tela(self):
 
 		self.botao_reinicio.pack_forget()
 
 		self.titulo.pack()
+		self.ponto_referencia_label["text"] = "Nome do Ponto de Referencia"
 		self.ponto_referencia_label.pack(side=LEFT)
 		self.ponto_referencia.pack(side=LEFT)
+		self.numero_pacotes_label["text"] = "Numero de pacotes"
 		self.numero_pacotes_label.pack(side=LEFT)
 		self.numero_pacotes.pack(side=LEFT)
 		self.intervalo_label.pack(side=LEFT)
 		self.intervalo.pack(side=LEFT)
 		self.botao_inicio.pack()
 		self.mensagem.pack()
+		self.mac_forjado_pr_label.pack_forget()
+
 
 
 	def atualizar_tela(self):
 
 		self.botao_inicio.pack_forget()
 		self.ponto_referencia.pack_forget()
-		self.ponto_referencia_label.pack_forget()
+		# self.ponto_referencia_label.pack_forget()
 		self.numero_pacotes.pack_forget()
-		self.numero_pacotes_label.pack_forget()
+		# self.numero_pacotes_label.pack_forget()
 		self.intervalo.pack_forget()
 		self.intervalo_label.pack_forget()
 
 		self.botao_reinicio.pack(side=BOTTOM)
+
+		self.mac_forjado_pr_label["text"] = "Mac forjado:  " + self.mac_forjado_pr
+		self.mac_forjado_pr_label.pack()
+
+		self.numero_pacotes_label["text"] = self.numero_pacotes.get() + " de pacotes forjados"
+
+		self.ponto_referencia_label["text"] = "Ponto de Referencia:  " + self.ponto_referencia.get()
+		# self.ponto_referencia_label = Label(self.segundoContainer,text="Nome do Ponto de Referencia", font=self.fontePadrao)
+
+
 
 	def criacao_mac_ponto_referencia(self):
 
@@ -153,6 +173,7 @@ class Application:
 
 		mac_forjado = ':'.join(s.encode('hex') for s in hash_nome_pr.decode('hex'))
 
+		self.mac_forjado_pr = mac_forjado;
 
 		print '\n____________________________________________________\n'
 		print 'Sufixo: '+  sufixo
