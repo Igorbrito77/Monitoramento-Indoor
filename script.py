@@ -8,11 +8,8 @@ def geracao_pacotes(mac_forjado_pr):
 	iface = 'wlp3s0mon'   #Nome da Interface Wireless
 
 
-	tempo_execucao = int(input("Insira o tempo de execucao (minutos): "))
-
-	# num_pacotes = int(input("Insira o numero de pacotes a serem enviados: "))
+	tempo_execucao = float(input("Insira o tempo de execucao (minutos): "))
 	intervalo_envio = float(input("Insira o intervalo de frequencia de envio de pacotes (em segundos) : "))
-
 	num_pacotes = (tempo_execucao * 60)/intervalo_envio
 
 	## addr1 = MAC de destino (MAC da placa wireless)
@@ -65,10 +62,10 @@ def criacao_mac_ponto_referencia():
 	mac_forjado = ':'.join(s.encode('hex') for s in hash_nome_pr.decode('hex'))
 
 
-	# print '\n____________________________________________________\n'
-	# print 'Sufixo: '+  sufixo
-	# print '\nEndereco MAC forjado: ' + mac_forjado
-	# print '\n____________________________________________________\n'
+	print '\n____________________________________________________\n'
+	print 'Sufixo: '+  sufixo
+	print '\nEndereco MAC forjado: ' + mac_forjado
+	print '\n____________________________________________________\n'
 	
 
 	return mac_forjado
