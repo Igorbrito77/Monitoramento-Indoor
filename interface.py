@@ -98,26 +98,25 @@ class Application:
 
 	
 	def enviar_pacotes(self):
-		self.criacao_mac_ponto_referencia()
-		self.atualizar_tela()
-		# ponto_referencia = self.ponto_referencia.get()
-		# numero_pacotes = self.numero_pacotes.get()
-		# intervalo_envio = self.intervalo.get()
+		
+		ponto_referencia = self.ponto_referencia.get()
+		numero_pacotes = self.numero_pacotes.get()
+		intervalo_envio = self.intervalo.get()
 
 
-		# if ponto_referencia == "":
-		# 	self.mensagem["text"] = "Insira o nome do Ponto de Referencia"
-		# 	return
+		if ponto_referencia == "":
+			self.mensagem["text"] = "Insira o nome do Ponto de Referencia"
+			return
 
-		# if numero_pacotes == "":
-		# 	self.mensagem["text"] = "Insira o numero de pacotes"
-		# 	return
+		if numero_pacotes == "":
+			self.mensagem["text"] = "Insira o numero de pacotes"
+			return
 
-		# if intervalo_envio == "":
-		# 	self.mensagem["text"] = "Insira o intervalo de envio"
-		# 	return
+		if intervalo_envio == "":
+			self.mensagem["text"] = "Insira o intervalo de envio"
+			return
 
-		# self.geracao_pacotes()
+		self.geracao_pacotes()
 
 	def iniciar_tela(self):
 
