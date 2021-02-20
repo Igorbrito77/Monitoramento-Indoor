@@ -15,35 +15,29 @@ def fdh(message, n):
 
 	result = [] 
 
-	# Produce enough SHA512 digests to make a composite digest greater than or equal to N bits 
+	# Produz resumos de SHA512 suficientes para fazer um resumo composto maior ou igual a N bits
 	for i in range(ceil(n / 256)): 
 
-		# Append iteration count 
-		# to the message 
+		# Anexa contagem de iteração à mensagem
 		currentMsg = str(message) + str(i) 
 
-		# Add currrent hash to results list 
+		# Adicionar hash atual à lista de resultados
 		result.append(sha256((currentMsg).encode()).hexdigest())
 
-	print(result)
-
-	# Append all the computed hashes 
+	# Anexar todos os hashes computados
 	result = ''.join(result) 
 	
 	print(result)
 
-	# Obtaining binary representating 
+	# Obtenção de representação binária
 	resAsBinary = ''.join(format(ord(x), 'b') for x in result) 
 	
-	print(resAsBinary)
-	
-
 	# Cortando o hash para o tamanho necessário pegando apenas os bits iniciais 
 	resAsBinary = resAsBinary[:n] 
 		
 	print('Binário cortado --->', resAsBinary)
 	
-	# Converting back to the ASCII from binary format 
+	# Converter de volta para o formato ASCII binário
 	sufixo = binascii.unhexlify('00%x' % int(resAsBinary, 2)).hex() 
 	
 	hash_nome_pr = '000000' + sufixo.replace('00', '')

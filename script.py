@@ -1,5 +1,8 @@
 from scapy.all import Dot11,Dot11Beacon,Dot11Elt,RadioTap,sendp,hexdump
 import zlib
+import binascii 
+from math import ceil 
+from hashlib import sha256 
 
 
 def geracao_pacotes(mac_forjado_pr):
@@ -50,26 +53,41 @@ def geracao_pacotes(mac_forjado_pr):
 
 def criacao_mac_ponto_referencia():
 
-	prefixo = '0000'
+	message = input('Insira o nome do Ponto de Referência: ')
 
-	nome_pr = raw_input('Digite o nome do Ponto de Referencia: ')
+	numero_bits_sufixo = 24
 
-	sufixo = hex( zlib.crc32(nome_pr) % (1<<32))
+	result = [] 
 
+	# Produz resumos de SHA512 suficientes para fazer um resumo composto maior ou igual a N bits
+	for i in range(ceil(numero_bits_sufixo / 256)): 
 
-	hash_nome_pr = prefixo + sufixo.replace('0x', '')
+		# Anexa contagem de iteração à mensagem
+		currentMsg = str(message) + str(i) 
 
-	mac_forjado = ':'.join(s.encode('hex') for s in hash_nome_pr.decode('hex'))
+		# Adicionar hash atual à lista de resultados
+		result.append(sha256((currentMsg).encode()).hexdigest())
 
-
-	print '\n____________________________________________________\n'
-	print 'Sufixo: '+  sufixo
-	print '\nEndereco MAC forjado: ' + mac_forjado
-	print '\n____________________________________________________\n'
+	# Anexar todos os hashes computados
+	result = ''.join(result) 
 	
+	# Obtenção de representação binária
+	resAsBinary = ''.join(format(ord(x), 'b') for x in result) 
+	
+	# Cortando o hash para o tamanho necessário pegando apenas os bits iniciais 
+	resAsBinary = resAsBinary[:numero_bits_sufixo] 
+			
+	# Converter de volta para o formato ASCII binário
+	sufixo = binascii.unhexlify('00%x' % int(resAsBinary, 2)).hex() 
+	
+	hash_nome_pr = '000000' + sufixo.replace('00', '')
 
-	return mac_forjado
+	array_mac = []
+	for i in range(0, 12, 2):
+		array_mac.append(hash_nome_pr[i] + hash_nome_pr[i+1])
 
+	return ':'.join(array_mac)	
+	
 
 def main():
 	mac_forjado_pr = criacao_mac_ponto_referencia()
