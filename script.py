@@ -1,59 +1,65 @@
-from scapy.all import Dot11,Dot11Beacon,Dot11Elt,RadioTap,sendp,hexdump
-import zlib
+# from scapy.all import Dot11,Dot11Beacon,Dot11Elt,RadioTap,sendp,hexdump
+# import zlib
 import binascii 
 from math import ceil 
 from hashlib import sha256 
 
 
-def geracao_pacotes(mac_forjado_pr):
+def geracao_pacotes():
 
-	netSSID = 'testSSID' 
-	iface = 'wlp3s0mon'   #Nome da Interface Wireless
+	nome_ponto_referencia = input('Insira o nome do Ponto de Referência: ')
+	mac_forjado_pr = criacao_mac_ponto_referencia(nome_ponto_referencia)
+	print(mac_forjado_pr)
 
+	with open('lista_ponto_referencias.txt', 'a') as arquivo:
+		arquivo.write('\n ' + nome_ponto_referencia+ ' . '+ mac_forjado_pr)
+	arquivo.close()
 
-	tempo_execucao = float(input("Insira o tempo de execucao (minutos): "))
-	intervalo_envio = float(input("Insira o intervalo de frequencia de envio de pacotes (em segundos) : "))
-	num_pacotes = (tempo_execucao * 60)/intervalo_envio
-
-	## addr1 = MAC de destino (MAC da placa wireless)
-	## addr2 = Endereco MAC de origem do remetente. (MAC forjado)
-	## addr3 = Endereco MAC do ponto de acesso.
-
-	dot11 = Dot11(type=0, subtype=8, addr1='E4:18:6B:4B:94:00', addr2=mac_forjado_pr, addr3='33:33:33:33:33:33')
-
-	beacon = Dot11Beacon(cap='ESS+privacy') ## indica a capacidade do ponto de acesso
-
-	essid = Dot11Elt(ID='SSID',info=netSSID, len=len(netSSID))
+	# netSSID = 'testSSID' 
+	# iface = 'wlp3s0mon'   #Nome da Interface Wireless
 
 
-	rsn = Dot11Elt(ID='RSNinfo', info=(
-	'\x01\x00'
-	'\x00\x0f\xac\x02'
-	'\x02\x00'
-	'\x00\x0f\xac\x04'
-	'\x00\x0f\xac\x02'
-	'\x01\x00'
-	'\x00\x0f\xac\x02'
-	'\x00\x00'))
+	# tempo_execucao = float(input("Insira o tempo de execucao (minutos): "))
+	# intervalo_envio = float(input("Insira o intervalo de frequencia de envio de pacotes (em segundos) : "))
+	# num_pacotes = (tempo_execucao * 60)/intervalo_envio
 
-	frame = RadioTap()/dot11/beacon/essid/rsn
+	# ## addr1 = MAC de destino (MAC da placa wireless)
+	# ## addr2 = Endereco MAC de origem do remetente. (MAC forjado)
+	# ## addr3 = Endereco MAC do ponto de acesso.
 
-	frame.show()
-	print("HexDump of frame")
+	# dot11 = Dot11(type=0, subtype=8, addr1='E4:18:6B:4B:94:00', addr2=mac_forjado_pr, addr3='33:33:33:33:33:33')
 
-	hexdump(frame)
+	# beacon = Dot11Beacon(cap='ESS+privacy') ## indica a capacidade do ponto de acesso
 
-	# print '\n\n____________________________________________________\n'
-	raw_input("Digite enter para o inicio do envio de pacotes:")
+	# essid = Dot11Elt(ID='SSID',info=netSSID, len=len(netSSID))
 
 
-	sendp(frame, iface=iface, inter=intervalo_envio, loop=0, count=num_pacotes) # inter = intervalo entre o envio dos pacotes
+	# rsn = Dot11Elt(ID='RSNinfo', info=(
+	# '\x01\x00'
+	# '\x00\x0f\xac\x02'
+	# '\x02\x00'
+	# '\x00\x0f\xac\x04'
+	# '\x00\x0f\xac\x02'
+	# '\x01\x00'
+	# '\x00\x0f\xac\x02'
+	# '\x00\x00'))
+
+	# frame = RadioTap()/dot11/beacon/essid/rsn
+
+	# frame.show()
+	# print("HexDump of frame")
+
+	# hexdump(frame)
+
+	# # print '\n\n____________________________________________________\n'
+	# raw_input("Digite enter para o inicio do envio de pacotes:")
+
+
+	# sendp(frame, iface=iface, inter=intervalo_envio, loop=0, count=num_pacotes) # inter = intervalo entre o envio dos pacotes
 
 
 
-def criacao_mac_ponto_referencia():
-
-	message = input('Insira o nome do Ponto de Referência: ')
+def criacao_mac_ponto_referencia(nome_ponto_referencia):
 
 	numero_bits_sufixo = 24
 
@@ -63,7 +69,7 @@ def criacao_mac_ponto_referencia():
 	for i in range(ceil(numero_bits_sufixo / 256)): 
 
 		# Anexa contagem de iteração à mensagem
-		currentMsg = str(message) + str(i) 
+		currentMsg = str(nome_ponto_referencia) + str(i) 
 
 		# Adicionar hash atual à lista de resultados
 		result.append(sha256((currentMsg).encode()).hexdigest())
@@ -90,8 +96,8 @@ def criacao_mac_ponto_referencia():
 	
 
 def main():
-	mac_forjado_pr = criacao_mac_ponto_referencia()
-	geracao_pacotes(mac_forjado_pr)
+	# mac_forjado_pr = criacao_mac_ponto_referencia()
+	geracao_pacotes()
 
 
 
