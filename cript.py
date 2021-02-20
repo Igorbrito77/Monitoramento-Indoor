@@ -29,7 +29,7 @@ def fdh(message, n):
 
 	# Append all the computed hashes 
 	result = ''.join(result) 
-
+	
 	print(result)
 
 	# Obtaining binary representating 
@@ -44,8 +44,15 @@ def fdh(message, n):
 	print('Binário cortado --->', resAsBinary)
 	
 	# Converting back to the ASCII from binary format 
-	return binascii.unhexlify('00%x' % int(resAsBinary, 2)).hex() 
+	sufixo = binascii.unhexlify('00%x' % int(resAsBinary, 2)).hex() 
+	
+	hash_nome_pr = '000000' + sufixo.replace('00', '')
 
+	array_mac = []
+	for i in range(0, 12, 2):
+		array_mac.append(hash_nome_pr[i] + hash_nome_pr[i+1])
+
+	return ':'.join(array_mac)	
 
 
 
