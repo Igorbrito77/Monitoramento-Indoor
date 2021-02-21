@@ -1,6 +1,4 @@
-# from scapy.all import Dot11,Dot11Beacon,Dot11Elt,RadioTap,sendp,hexdump
-# import zlib
-from scapy.all import *
+from scapy.all import Dot11,Dot11Elt,RadioTap,sendp
 import binascii 
 from math import ceil 
 from hashlib import sha256 
@@ -11,10 +9,6 @@ def geracao_pacotes():
 	nome_ponto_referencia = input('Insira o nome do Ponto de Referência: ')
 	mac_forjado_pr = criacao_mac_ponto_referencia(nome_ponto_referencia)
 	print(mac_forjado_pr)
-
-	with open('lista_ponto_referencias.txt', 'a') as arquivo:
-		arquivo.write('\n ' + nome_ponto_referencia+ ' . '+ mac_forjado_pr)
-	arquivo.close()
 
 	tempo_execucao = float(input("Insira o tempo de execucao (minutos): "))
 	intervalo_envio = float(input("Insira o intervalo de frequencia de envio de pacotes (em segundos) : "))
@@ -39,7 +33,7 @@ def geracao_pacotes():
 
 	sendp(frame, iface='wlp3s0mon', inter=intervalo_envio, loop=0, count=num_pacotes) # iface = Nome da Interface Wireless. inter = intervalo entre o envio dos pacotes (em segundos). count = numero de pacotes 
 
-
+	escreve_arquivo(nome_ponto_referencia, mac_forjado_pr)
 
 
 def criacao_mac_ponto_referencia(nome_ponto_referencia):
@@ -54,10 +48,10 @@ def criacao_mac_ponto_referencia(nome_ponto_referencia):
 		# Anexa contagem de iteração à mensagem
 		currentMsg = str(nome_ponto_referencia) + str(i) 
 
-		# Adicionar hash atual à lista de resultados
+		# Adiciona hash atual à lista de resultados
 		result.append(sha256((currentMsg).encode()).hexdigest())
 
-	# Anexar todos os hashes computados
+	# Anexa todos os hashes computados
 	result = ''.join(result) 
 	
 	# Obtenção de representação binária
@@ -66,7 +60,7 @@ def criacao_mac_ponto_referencia(nome_ponto_referencia):
 	# Cortando o hash para o tamanho necessário pegando apenas os bits iniciais 
 	resAsBinary = resAsBinary[:numero_bits_sufixo] 
 			
-	# Converter de volta para o formato ASCII binário
+	# Converte de volta para o formato ASCII binário
 	sufixo = binascii.unhexlify('00%x' % int(resAsBinary, 2)).hex() 
 	
 	hash_nome_pr = '000000' + sufixo.replace('00', '')
@@ -76,12 +70,16 @@ def criacao_mac_ponto_referencia(nome_ponto_referencia):
 		array_mac.append(hash_nome_pr[i] + hash_nome_pr[i+1])
 
 	return ':'.join(array_mac)	
-	
+
+def escreve_arquivo(nome_ponto_referencia, mac_forjado_pr):
+
+	with open('lista_ponto_referencias.txt', 'a') as arquivo:
+		arquivo.write('\n ' + nome_ponto_referencia+ ' | '+ mac_forjado_pr)
+	arquivo.close()
+
 
 def main():
-	# mac_forjado_pr = criacao_mac_ponto_referencia()
 	geracao_pacotes()
-
 
 
 main()
