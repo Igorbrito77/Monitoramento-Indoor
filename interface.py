@@ -58,19 +58,29 @@ class Application:
 		self.numero_pacotes["font"] = self.fontePadrao
 
 
+		########################################  TEMPO DE EXECUCAO:
+
+
+		self.tempo_execucao_label = Label(self.terceiroContainer,text="Tempo de execucao", font=self.fontePadrao)
+
+		self.tempo_execucao = Entry(self.terceiroContainer)
+		self.tempo_execucao["width"] = 30
+		self.tempo_execucao["font"] = self.fontePadrao
+
+
 		########################################  INETERVALO DE ENVIO:
 
 
-		self.intervalo_label = Label(self.terceiroContainer, text="Intervalo de envio", font=self.fontePadrao)
+		self.intervalo_label = Label(self.quartoContainer, text="Intervalo de envio", font=self.fontePadrao)
 
-		self.intervalo = Entry(self.terceiroContainer)
+		self.intervalo = Entry(self.quartoContainer)
 		self.intervalo["width"] = 30
 		self.intervalo["font"] = self.fontePadrao
 
 
 		########################################  BOTAO DE INICIO:
 
-		self.botao_inicio = Button(self.quartoContainer)
+		self.botao_inicio = Button(self.quintoContainer)
 		self.botao_inicio["text"] = "Iniciar"
 		self.botao_inicio["font"] = ("Calibri", "8")
 		self.botao_inicio["width"] = 12
@@ -98,7 +108,7 @@ class Application:
 
 	
 	def enviar_pacotes(self):
-		
+
 		ponto_referencia = self.ponto_referencia.get()
 		numero_pacotes = self.numero_pacotes.get()
 		intervalo_envio = self.intervalo.get()
@@ -108,8 +118,8 @@ class Application:
 			self.mensagem["text"] = "Insira o nome do Ponto de Referencia"
 			return
 
-		if numero_pacotes == "":
-			self.mensagem["text"] = "Insira o numero de pacotes"
+		if numero_pacotes == "" and tempo_execucao == "":
+			self.mensagem["text"] = "Insira o numero de pacotes ou tempo de execucao"
 			return
 
 		if intervalo_envio == "":
@@ -129,6 +139,8 @@ class Application:
 		self.numero_pacotes_label["text"] = "Numero de pacotes"
 		self.numero_pacotes_label.pack(side=LEFT)
 		self.numero_pacotes.pack(side=LEFT)
+		self.tempo_execucao_label.pack(side=LEFT)
+		self.tempo_execucao.pack(side=LEFT)
 		self.intervalo_label.pack(side=LEFT)
 		self.intervalo.pack(side=LEFT)
 		self.botao_inicio.pack()
@@ -219,7 +231,7 @@ class Application:
 
 		hexdump(frame)
 
-		a = sendp(frame, iface=iface, inter=intervalo_envio, loop=0, count=numero_pacotes) # inter = intervalo entre o envio dos pacotes
+		a = sendp(frame/"RURALRURALRURAL", iface=iface, inter=intervalo_envio, loop=0, count=numero_pacotes) # inter = intervalo entre o envio dos pacotes
 		print(a)
 
 
