@@ -1,7 +1,7 @@
 from scapy.all import Dot11,Dot11Elt,RadioTap,sendp
 import binascii 
 from math import ceil 
-from hashlib import sha256 
+import hashlib  
 
 
 def geracao_pacotes():
@@ -39,37 +39,31 @@ def geracao_pacotes():
 def criacao_mac_ponto_referencia(nome_ponto_referencia):
 
 	numero_bits_sufixo = 24
+	prefixo = '000000'
+	  
+	# Utilizando md5 pra hashing
+	pr_encriptado = hashlib.md5(nome_ponto_referencia.encode()) 
+	  
+	# Passando pr encriptado pra hexadecimal
+	pr_encriptado = pr_encriptado.hexdigest()
 
-	result = [] 
-
-	# Produz resumos de SHA512 suficientes para fazer um resumo composto maior ou igual a N bits
-	for i in range(ceil(numero_bits_sufixo / 256)): 
-
-		# Anexa contagem de iteração à mensagem
-		currentMsg = str(nome_ponto_referencia) + str(i) 
-
-		# Adiciona hash atual à lista de resultados
-		result.append(sha256((currentMsg).encode()).hexdigest())
-
-	# Anexa todos os hashes computados
-	result = ''.join(result) 
+	# Passando pr encriptado pra binário
+	pr_binario = ''.join(format(ord(x), 'b') for x in pr_encriptado) 
 	
-	# Obtenção de representação binária
-	resAsBinary = ''.join(format(ord(x), 'b') for x in result) 
-	
-	# Cortando o hash para o tamanho necessário pegando apenas os bits iniciais 
-	resAsBinary = resAsBinary[:numero_bits_sufixo] 
+	# Cortando o hash para o tamanho necessário, pegando apenas os bits finais 
+	pr_binario = pr_binario[(len(pr_binario) - numero_bits_sufixo):len(pr_binario)] 
 			
-	# Converte de volta para o formato ASCII binário
-	sufixo = binascii.unhexlify('00%x' % int(resAsBinary, 2)).hex() 
-	
-	hash_nome_pr = '000000' + sufixo.replace('00', '')
+	# Passando pr encriptado pra hexadecimal
+	sufixo = binascii.unhexlify('00%x' % int(pr_binario, 2)).hex() 
+
+	hash_nome_pr = prefixo + sufixo.replace('00', '')
 
 	array_mac = []
 	for i in range(0, 12, 2):
 		array_mac.append(hash_nome_pr[i] + hash_nome_pr[i+1])
 
 	return ':'.join(array_mac)	
+
 
 def escreve_arquivo(nome_ponto_referencia, mac_forjado_pr):
 
