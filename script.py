@@ -8,10 +8,13 @@ def geracao_pacotes():
 
 	nome_ponto_referencia = input('Insira o nome do Ponto de Referência: ')
 	mac_forjado_pr = criacao_mac_ponto_referencia(nome_ponto_referencia)
-	print(mac_forjado_pr)
 
 	tempo_execucao = float(input("Insira o tempo de execucao (minutos): "))
+	print('\n_________________________________________')
+
 	intervalo_envio = float(input("Insira o intervalo de frequencia de envio de pacotes (em segundos) : "))
+	print('\n_________________________________________')
+
 	num_pacotes = (tempo_execucao * 60)/intervalo_envio
 
 
@@ -62,7 +65,13 @@ def criacao_mac_ponto_referencia(nome_ponto_referencia):
 	for i in range(0, 12, 2):
 		array_mac.append(hash_nome_pr[i] + hash_nome_pr[i+1])
 
-	return ':'.join(array_mac)	
+	mac_forjado_pr = ':'.join(array_mac)
+
+	print('\nMAC FORJADO: ', mac_forjado_pr)
+	print('\n_________________________________________')
+
+
+	return mac_forjado_pr	
 
 
 def escreve_arquivo(nome_ponto_referencia, mac_forjado_pr):
