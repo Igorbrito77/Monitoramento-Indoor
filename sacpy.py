@@ -23,7 +23,7 @@ dot11=  Ether(src="aa:bb:cc:dd:ee:ff", dst="E4:18:6B:4B:94:00")
 # essid = Dot11Elt(ID='SSID',info='testSSID', len=len('testSSID'))
 
 
-frame = dot11/data
+frame = RadioTap()/dot11/data
 
 frame.show()
 
