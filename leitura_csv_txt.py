@@ -11,4 +11,27 @@ except:
 
 
 
-print(dataFrame['ID'])
+# print(dataFrame.count())
+
+
+# vet = { "sala" : {"vetor_tempo" : []}, "quarto" : {"vetor_tempo" : []}, "cozinha" : {"vetor_tempo" : []} }
+
+vet = []
+
+# tempo_inicial = '2021-02-27 19:50:08.376471' 
+
+tuplas = dataFrame.itertuples()
+
+# tamanho = len(list(tuplas))
+
+
+for i in tuplas:
+
+    if(i.device_id == 'sala'):
+        vet.append({  i.device_signal, i.date_time })
+
+    if(len(vet)== 20):
+        break
+
+
+print(vet)
