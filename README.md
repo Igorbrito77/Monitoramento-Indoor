@@ -20,6 +20,10 @@ Implementação de um programa que gera pacotes com endereço MAC forjado para a
 
 * Executar o arquivo script.py : **python script.py**
 
+### Execução da geração de pacotes com interface gráfica
+
+* Executar o arquivo script.py : **python interface.py**
+
 
 ## Teste da geração de pacotes
 

@@ -1,75 +1,88 @@
-from scapy.all import Dot11,Dot11Beacon,Dot11Elt,RadioTap,sendp,hexdump
-import zlib
+from scapy.all import Dot11,Dot11Elt,RadioTap,sendp
+import binascii 
+from math import ceil 
+import hashlib  
 
 
-def geracao_pacotes(mac_forjado_pr):
+def geracao_pacotes():
 
-	netSSID = 'testSSID' 
-	iface = 'wlp3s0mon'   #Nome da Interface Wireless
+	nome_ponto_referencia = input('Insira o nome do Ponto de Referência: ')
+	mac_forjado_pr = criacao_mac_ponto_referencia(nome_ponto_referencia)
 
+	tempo_execucao = float(input("Insira o tempo de execucao (minutos): "))
+	print('\n_________________________________________')
+
+	intervalo_envio = float(input("Insira o intervalo de frequencia de envio de pacotes (em segundos) : "))
+	print('\n_________________________________________')
+
+	num_pacotes = (tempo_execucao * 60)/intervalo_envio
+
+
+	data = "UFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJUFRRJ"
 
 	## addr1 = MAC de destino (MAC da placa wireless)
 	## addr2 = Endereco MAC de origem do remetente. (MAC forjado)
 	## addr3 = Endereco MAC do ponto de acesso.
+	dot11 = Dot11(type=2, subtype=0, addr1='E4:18:6B:4B:94:00', addr2=mac_forjado_pr, addr3='33:33:33:33:33:33')
 
-	dot11 = Dot11(type=0, subtype=8, addr1='E4:18:6B:4B:94:00', addr2=mac_forjado_pr, addr3='33:33:33:33:33:33')
+	essid = Dot11Elt(ID='SSID',info='testSSID', len=len('testSSID')) # indica a capacidade do ponto de acesso
 
-	beacon = Dot11Beacon(cap='ESS+privacy') ## indica a capacidade do ponto de acesso
-
-	essid = Dot11Elt(ID='SSID',info=netSSID, len=len(netSSID))
-
-
-	rsn = Dot11Elt(ID='RSNinfo', info=(
-	'\x01\x00'
-	'\x00\x0f\xac\x02'
-	'\x02\x00'
-	'\x00\x0f\xac\x04'
-	'\x00\x0f\xac\x02'
-	'\x01\x00'
-	'\x00\x0f\xac\x02'
-	'\x00\x00'))
-
-	frame = RadioTap()/dot11/beacon/essid/rsn
+	frame = RadioTap()/dot11/essid/data
 
 	frame.show()
-	print("HexDump of frame")
-
-	hexdump(frame)
-
-	print '\n\n____________________________________________________\n'
-	raw_input("Digite enter para o inicio do envio de pacotes:")
-
-	sendp(frame, iface=iface, inter=0.100, loop=1) # inter = intervalo entre o envio dos pacotes
+	 
+	input("Digite enter para o inicio do envio de pacotes:")
 
 
+	sendp(frame, iface='wlp3s0mon', inter=intervalo_envio, loop=0, count=num_pacotes) # iface = Nome da Interface Wireless. inter = intervalo entre o envio dos pacotes (em segundos). count = numero de pacotes 
 
-def criacao_mac_ponto_referencia():
-
-	prefixo = '0000'
-
-	nome_pr = raw_input('Digite o nome do Ponto de Referencia: ')
-
-	sufixo = hex( zlib.crc32(nome_pr) % (1<<32))
+	escreve_arquivo(nome_ponto_referencia, mac_forjado_pr)
 
 
-	hash_nome_pr = prefixo + sufixo.replace('0x', '')
+def criacao_mac_ponto_referencia(nome_ponto_referencia):
 
-	mac_forjado = ':'.join(s.encode('hex') for s in hash_nome_pr.decode('hex'))
+	numero_bits_sufixo = 24
+	prefixo = '000000'
+	  
+	# Utilizando md5 pra hashing
+	pr_encriptado = hashlib.md5(nome_ponto_referencia.encode()) 
+	  
+	# Passando pr encriptado pra hexadecimal
+	pr_encriptado = pr_encriptado.hexdigest()
 
-
-	print '\n____________________________________________________\n'
-	print 'Sufixo: '+  sufixo
-	print '\nEndereco MAC forjado: ' + mac_forjado
-	print '\n____________________________________________________\n'
+	# Passando pr encriptado pra binário
+	pr_binario = ''.join(format(ord(x), 'b') for x in pr_encriptado) 
 	
+	# Cortando o hash para o tamanho necessário, pegando apenas os bits finais 
+	pr_binario = pr_binario[(len(pr_binario) - numero_bits_sufixo):len(pr_binario)] 
+			
+	# Passando pr encriptado pra hexadecimal
+	sufixo = binascii.unhexlify('00%x' % int(pr_binario, 2)).hex() 
 
-	return mac_forjado
+	hash_nome_pr = prefixo + sufixo.replace('00', '')
+
+	array_mac = []
+	for i in range(0, 12, 2):
+		array_mac.append(hash_nome_pr[i] + hash_nome_pr[i+1])
+
+	mac_forjado_pr = ':'.join(array_mac)
+
+	print('\nMAC FORJADO: ', mac_forjado_pr)
+	print('\n_________________________________________')
+
+
+	return mac_forjado_pr	
+
+
+def escreve_arquivo(nome_ponto_referencia, mac_forjado_pr):
+
+	with open('lista_ponto_referencias.txt', 'a') as arquivo:
+		arquivo.write('\n ' + nome_ponto_referencia+ ' | '+ mac_forjado_pr)
+	arquivo.close()
 
 
 def main():
-	mac_forjado_pr = criacao_mac_ponto_referencia()
-	geracao_pacotes(mac_forjado_pr)
-
+	geracao_pacotes()
 
 
 main()
