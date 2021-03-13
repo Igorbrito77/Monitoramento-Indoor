@@ -12,11 +12,16 @@ except:
 
 
 data_inicial = '2021-02-27 16:35:51.677470'
-data_limite =  '2021-02-27 16:35:57.704400'
+data_limite =  '2021-02-27 16:35:57.677470'
 
 
 dt_sala = (dataFrame[ (dataFrame['date_time'] < data_limite )])
+
+## separar o dataframe por RP . seriam 7 dataframes
+
 # matriz 10x3
+
+
 print(dt_sala)
 
 
@@ -31,6 +36,8 @@ data = datetime.strptime(test[0].date_time, "%Y-%m-%d %H:%M:%S.%f")
 
 segundo_atual = data.second
 
+matrizT = []
+
 for i in tuplas:
 
 
@@ -44,20 +51,24 @@ for i in tuplas:
         
         print('sahblau')
         
+        vetorBi = []
+
         if(len(obj_media['cozinha']['vetor_auxiliar']) == 0):
-            obj_media['cozinha']['vetor_amostras'].append(0)
+            vetorBi.append(0)
         else:
-             obj_media['cozinha']['vetor_amostras'].append(int( sum(obj_media['cozinha']['vetor_auxiliar']) / len(obj_media['cozinha']['vetor_auxiliar'])) )
+            vetorBi.append(int( sum(obj_media['cozinha']['vetor_auxiliar']) / len(obj_media['cozinha']['vetor_auxiliar'])) )
 
         if(len(obj_media['sala']['vetor_auxiliar']) == 0):
-            obj_media['sala']['vetor_amostras'].append(0)
+            vetorBi.append(0)
         else:
-             obj_media['sala']['vetor_amostras'].append(int( sum(obj_media['sala']['vetor_auxiliar']) / len(obj_media['sala']['vetor_auxiliar'])) )
+            vetorBi.append(int( sum(obj_media['sala']['vetor_auxiliar']) / len(obj_media['sala']['vetor_auxiliar'])) )
 
         if(len(obj_media['quarto']['vetor_auxiliar']) == 0):
-            obj_media['quarto']['vetor_amostras'].append(0)
+            vetorBi.append(0)
         else:
-             obj_media['quarto']['vetor_amostras'].append(int( sum(obj_media['quarto']['vetor_auxiliar']) / len(obj_media['quarto']['vetor_auxiliar'])) )
+            vetorBi.append(int( sum(obj_media['quarto']['vetor_auxiliar']) / len(obj_media['quarto']['vetor_auxiliar'])) )
+
+        matrizT.append({'PR': i.id_addr, 'sinal_cozinha' : vetorBi[0], 'sinal_sala': vetorBi[1] , 'sinal_quarto': vetorBi[2]  })
 
 
         obj_media['cozinha']['vetor_auxiliar'].clear()
@@ -75,8 +86,12 @@ obj_media['quarto']['vetor_auxiliar'].clear()
 print(obj_media)
 
 
-matriz_treino = [ obj_media['sala']['vetor_amostras'] , obj_media['quarto']['vetor_amostras'], obj_media['cozinha']['vetor_amostras']   ]
-matriz_treino = np.transpose(matriz_treino)
+# {'device_id': 'informatica', 'mac': '129858', 's': '-59', 't': '0988', 'd': 1575630298428}
 
+# {'PR' : 131341, 'sinal_sala' : -54. 'sinal_quarto': -97 , 'sinal_cozinha: 0'}
 
-print(matriz_treino)
+print(matrizT)
+
+dataFrameT =  pd.DataFrame.from_dict(matrizT)
+
+print(dataFrameT)
