@@ -1,5 +1,6 @@
 import pandas as pd 
-
+import numpy as np
+from datetime import datetime, timedelta
 
 try:
     dataFrame = pd.read_csv ('pkts-tcc-igor.csv') 
@@ -15,61 +16,79 @@ data_limite =  '2021-02-27 16:35:52.704400'
 numero_amostras = 10
 
 
-dt_sala = (dataFrame[ (dataFrame['device_id'] == 'sala') & (dataFrame['date_time'] < data_limite )]) #['date_time']
-
-
-
+dt_sala = (dataFrame[ (dataFrame['date_time'] < data_limite )]) #['date_time']
 # matriz 10x3
-
 print(dt_sala)
+
 
 tuplas = dt_sala.itertuples()
 
-vet = []
-vetor_auxiliar = []
+obj_media = { 'sala' :  {'vetor_amostras' : [] , 'vetor_auxiliar' : []} , 'quarto' : {'vetor_amostras' : [], 'vetor_auxiliar' : []}, 'cozinha' : {'vetor_amostras' : [], 'vetor_auxiliar' : []}}
 
-obj_media = { 'sala' : vetor_amostras : [] , 'quarto' : vetor_amostras : [], 'cozinha' : vetor_amostras : []}
+outrp = dt_sala.itertuples()
+test = list(outrp)
+
+data = datetime.strptime(test[0].date_time, "%Y-%m-%d %H:%M:%S.%f")
+
+segundo_atual = data.second
 
 for i in tuplas:
 
-    # if(i.device_id == 'sala'):
-    #     vet.append({  i.device_signal, i.date_time })
 
-    vetor_auxiliar.append(i.device_signal)
+    obj_media[i.device_id]['vetor_auxiliar'].append(i.device_signal)
 
     # se a data subir um minuto, fazer a média das datas acumuladas e guardar no array de amostra
-    # vet.append(i.date_time) 
 
-    if(len(vetor_auxiliar) > 10):
-        vet.append( [ int( sum(vetor_auxiliar) / len(vetor_auxiliar) ) ] )
-        vetor_auxiliar.clear()
+    data = datetime.strptime(i.date_time, "%Y-%m-%d %H:%M:%S.%f")
 
-    if(len(vet) >  50 ):
-        break
+    if(data.second > segundo_atual):
+        
+        print('sahblau')
+        
+        if(len(obj_media['cozinha']['vetor_auxiliar']) == 0):
+            obj_media['cozinha']['vetor_amostras'].append(0)
+        else:
+             obj_media['cozinha']['vetor_amostras'].append(int( sum(obj_media['cozinha']['vetor_auxiliar']) / len(obj_media['cozinha']['vetor_auxiliar'])) )
 
-print(vet)
+        if(len(obj_media['sala']['vetor_auxiliar']) == 0):
+            obj_media['sala']['vetor_amostras'].append(0)
+        else:
+             obj_media['sala']['vetor_amostras'].append(int( sum(obj_media['sala']['vetor_auxiliar']) / len(obj_media['sala']['vetor_auxiliar'])) )
 
-
-# vet = { "sala" : {"vetor_tempo" : []}, "quarto" : {"vetor_tempo" : []}, "cozinha" : {"vetor_tempo" : []} }
-
-# # vet = []
-
-# # tempo_inicial = '2021-02-27 16:35:51.677470' 
-
-# tuplas = dataFrame.itertuples()
-
-# # tamanho = len(list(tuplas))
-
-
-# for i in tuplas:
-
-#     # if(i.device_id == 'sala'):
-#     #     vet.append({  i.device_signal, i.date_time })
-
-#     vet[i.device_id]['vetor_tempo'].append(i.date_time) 
-
-#     if(i.date_time >  '2021-02-27 16:35:52.677470' ):
-#         break
+        if(len(obj_media['quarto']['vetor_auxiliar']) == 0):
+            obj_media['quarto']['vetor_amostras'].append(0)
+        else:
+             obj_media['quarto']['vetor_amostras'].append(int( sum(obj_media['quarto']['vetor_auxiliar']) / len(obj_media['quarto']['vetor_auxiliar'])) )
 
 
-# print(vet)
+        obj_media['cozinha']['vetor_auxiliar'].clear()
+        obj_media['sala']['vetor_auxiliar'].clear()
+        obj_media['quarto']['vetor_auxiliar'].clear()
+
+        segundo_atual = data.second
+
+
+# obj_media['cozinha']['vetor_auxiliar'].clear()
+# obj_media['sala']['vetor_auxiliar'].clear()
+# obj_media['quarto']['vetor_auxiliar'].clear()
+
+
+print(obj_media)
+
+# matriz_treino = np.array([[], [], []])
+
+
+
+# matriz_treino = [ obj_media['sala']['vetor_amostras'] , obj_media['quarto']['vetor_amostras'], obj_media['cozinha']['vetor_amostras']   ]
+
+# matriz_treino[0][0] = obj_media['sala']['vetor_amostras']
+# matriz_treino[0][1] = obj_media['quarto']['vetor_amostras']
+# matriz_treino[0][2] = obj_media['cozinha']['vetor_amostras']
+
+# matriz_treino = np.array([])
+
+# matriz_treino = np.column_stack((matriz_treino, obj_media['sala']['vetor_amostras']))
+
+
+# print(matriz_treino)
+
