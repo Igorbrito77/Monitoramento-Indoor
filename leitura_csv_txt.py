@@ -12,11 +12,10 @@ except:
 
 
 data_inicial = '2021-02-27 16:35:51.677470'
-data_limite =  '2021-02-27 16:35:52.704400'
-numero_amostras = 10
+data_limite =  '2021-02-27 16:35:57.704400'
 
 
-dt_sala = (dataFrame[ (dataFrame['date_time'] < data_limite )]) #['date_time']
+dt_sala = (dataFrame[ (dataFrame['date_time'] < data_limite )])
 # matriz 10x3
 print(dt_sala)
 
@@ -68,27 +67,16 @@ for i in tuplas:
         segundo_atual = data.second
 
 
-# obj_media['cozinha']['vetor_auxiliar'].clear()
-# obj_media['sala']['vetor_auxiliar'].clear()
-# obj_media['quarto']['vetor_auxiliar'].clear()
+obj_media['cozinha']['vetor_auxiliar'].clear()
+obj_media['sala']['vetor_auxiliar'].clear()
+obj_media['quarto']['vetor_auxiliar'].clear()
 
 
 print(obj_media)
 
-# matriz_treino = np.array([[], [], []])
+
+matriz_treino = [ obj_media['sala']['vetor_amostras'] , obj_media['quarto']['vetor_amostras'], obj_media['cozinha']['vetor_amostras']   ]
+matriz_treino = np.transpose(matriz_treino)
 
 
-
-# matriz_treino = [ obj_media['sala']['vetor_amostras'] , obj_media['quarto']['vetor_amostras'], obj_media['cozinha']['vetor_amostras']   ]
-
-# matriz_treino[0][0] = obj_media['sala']['vetor_amostras']
-# matriz_treino[0][1] = obj_media['quarto']['vetor_amostras']
-# matriz_treino[0][2] = obj_media['cozinha']['vetor_amostras']
-
-# matriz_treino = np.array([])
-
-# matriz_treino = np.column_stack((matriz_treino, obj_media['sala']['vetor_amostras']))
-
-
-# print(matriz_treino)
-
+print(matriz_treino)
