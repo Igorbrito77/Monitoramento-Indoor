@@ -42,6 +42,12 @@ for dtFrame in array_dataframes:
 
     segundo_atual = data.second
 
+    obj_media['cozinha']['vetor_auxiliar'].clear()
+    obj_media['sala']['vetor_auxiliar'].clear()
+    obj_media['quarto']['vetor_auxiliar'].clear()
+
+    limite_amostras = 0
+
     for i in tuplas:
 
         obj_media[i.device_id]['vetor_auxiliar'].append(i.device_signal)
@@ -76,11 +82,12 @@ for dtFrame in array_dataframes:
             obj_media['quarto']['vetor_auxiliar'].clear()
 
             segundo_atual = data.second
+            limite_amostras +=1
 
-
-    obj_media['cozinha']['vetor_auxiliar'].clear()
-    obj_media['sala']['vetor_auxiliar'].clear()
-    obj_media['quarto']['vetor_auxiliar'].clear()
+        if(limite_amostras == 7):
+            break
+            
+   
 
 
 print(obj_media)
