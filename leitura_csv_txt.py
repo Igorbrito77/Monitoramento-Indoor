@@ -2,6 +2,13 @@ import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 
+
+from sklearn.cluster import KMeans
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.model_selection import train_test_split
+from sklearn import metrics
+from sklearn.model_selection import GridSearchCV
+
 try:
     dataFrame = pd.read_csv ('pkts-tcc-igor.csv') 
 
@@ -26,7 +33,7 @@ dt_PR_7 =  (dataFrame[ (dataFrame['id_addr']  == 131717)])
 
 array_dataframes = [dt_PR_1, dt_PR_2, dt_PR_3, dt_PR_4, dt_PR_5, dt_PR_6, dt_PR_7]
 
-print(array_dataframes)
+# print(array_dataframes)
 
 obj_media = { 'sala' :  {'vetor_amostras' : [] , 'vetor_auxiliar' : []} , 'quarto' : {'vetor_amostras' : [], 'vetor_auxiliar' : []}, 'cozinha' : {'vetor_amostras' : [], 'vetor_auxiliar' : []}}
 
@@ -102,3 +109,21 @@ dataFrameT =  pd.DataFrame.from_dict(matrizT)
 print(dataFrameT)
 
 dataFrameT.to_csv('treinamento.csv')
+
+
+X_train, X_test, y_train, y_test = train_test_split(dataFrameT.drop(['PR'], 1), dataFrameT['PR'], test_size=0.3)
+
+print (X_train)
+
+print(X_test)
+
+knn = KNeighborsClassifier(n_neighbors=3) 
+
+print(knn.fit(X_train, y_train))
+
+# resultado = knn.predict([[43, -51]])
+resultado = knn.predict(X_test)
+
+# print(resultado)
+
+print (pd.crosstab(y_test,resultado, rownames=['Real'], colnames=['Predito'], margins=True))
