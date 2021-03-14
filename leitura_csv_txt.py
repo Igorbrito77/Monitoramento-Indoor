@@ -25,6 +25,7 @@ def abrir_arquivo():
 
 def montar_matriz_amostras(dataFrame):
 
+    ## separa o dataframe em partes, sendo que cada parte corresponde às leituras de sinal correspondentes a um Ponto de Referência específico
     dt_PR_1 =  (dataFrame[ (dataFrame['id_addr']  == 131341)])
     dt_PR_2 =  (dataFrame[ (dataFrame['id_addr']  == 131364)])
     dt_PR_3 =  (dataFrame[ (dataFrame['id_addr']  == 131402)])
@@ -34,60 +35,46 @@ def montar_matriz_amostras(dataFrame):
     dt_PR_7 =  (dataFrame[ (dataFrame['id_addr']  == 131717)])
 
     array_dataframes = [dt_PR_1, dt_PR_2, dt_PR_3, dt_PR_4, dt_PR_5, dt_PR_6, dt_PR_7]
-    # print(array_dataframes)
 
     obj_media = { 'sala' :  {'vetor_amostras' : [] , 'vetor_auxiliar' : []} , 'quarto' : {'vetor_amostras' : [], 'vetor_auxiliar' : []}, 'cozinha' : {'vetor_amostras' : [], 'vetor_auxiliar' : []}}
 
-    matrizT = []
+    matrizT = [] # Matriz de treinamento que será formada ao longo da execução do algoritmo
 
-    for dtFrame in array_dataframes: 
+    for data_frame_pr in array_dataframes: ## são coletadas as amostras 
 
-        tuplas = dtFrame.itertuples()
+        tuplas_leitura_sinal = data_frame_pr.itertuples()
 
-        outrp = dtFrame.itertuples()
-        test = list(outrp)
+        tuplas_aux = data_frame_pr.itertuples()
+        test = list(tuplas_aux)
         data = datetime.strptime(test[0].date_time, "%Y-%m-%d %H:%M:%S.%f")
 
         segundo_atual = data.second
 
-        obj_media['cozinha']['vetor_auxiliar'].clear()
-        obj_media['sala']['vetor_auxiliar'].clear()
-        obj_media['quarto']['vetor_auxiliar'].clear()
+        for key in obj_media:
+            obj_media[key]['vetor_auxiliar'].clear()
 
         limite_amostras = 0
 
-        for i in tuplas:
+        for leitura_sinal in tuplas_leitura_sinal:
 
-            obj_media[i.device_id]['vetor_auxiliar'].append(i.device_signal)
+            obj_media[leitura_sinal.device_id]['vetor_auxiliar'].append(leitura_sinal.device_signal) # os valores da intensidade de sinal vão sendo armazenados enquanrto não se passa 1 segundo
 
-            # se a data subir um minuto, fazer a média das datas acumuladas e guardar no array de amostra
-            data = datetime.strptime(i.date_time, "%Y-%m-%d %H:%M:%S.%f")
+            data = datetime.strptime(leitura_sinal.date_time, "%Y-%m-%d %H:%M:%S.%f")
 
-            if(data.second > segundo_atual):
-                            
+            if(data.second > segundo_atual): # se a data subir um minuto, fazer a média dos sinais acumuladas e guardar no array de amostra
+
                 vetorBi = []
+                
+                for key in obj_media:
+                    if(len(obj_media[key]['vetor_auxiliar']) == 0):
+                        vetorBi.append(0)
+                    else:
+                        vetorBi.append(int( sum(obj_media[key]['vetor_auxiliar']) / len(obj_media[key]['vetor_auxiliar'])) )
 
-                if(len(obj_media['cozinha']['vetor_auxiliar']) == 0):
-                    vetorBi.append(0)
-                else:
-                    vetorBi.append(int( sum(obj_media['cozinha']['vetor_auxiliar']) / len(obj_media['cozinha']['vetor_auxiliar'])) )
+                    obj_media[key]['vetor_auxiliar'].clear()
 
-                if(len(obj_media['sala']['vetor_auxiliar']) == 0):
-                    vetorBi.append(0)
-                else:
-                    vetorBi.append(int( sum(obj_media['sala']['vetor_auxiliar']) / len(obj_media['sala']['vetor_auxiliar'])) )
-
-                if(len(obj_media['quarto']['vetor_auxiliar']) == 0):
-                    vetorBi.append(0)
-                else:
-                    vetorBi.append(int( sum(obj_media['quarto']['vetor_auxiliar']) / len(obj_media['quarto']['vetor_auxiliar'])) )
-
-                matrizT.append({'PR': i.id_addr, 'sinal_cozinha' : vetorBi[0], 'sinal_sala': vetorBi[1] , 'sinal_quarto': vetorBi[2]  })
-
-
-                obj_media['cozinha']['vetor_auxiliar'].clear()
-                obj_media['sala']['vetor_auxiliar'].clear()
-                obj_media['quarto']['vetor_auxiliar'].clear()
+                    
+                matrizT.append({'ponto_referencia': leitura_sinal.id_addr, 'sinal_cozinha' : vetorBi[0], 'sinal_sala': vetorBi[1] , 'sinal_quarto': vetorBi[2]  })
 
                 segundo_atual = data.second
                 limite_amostras +=1
@@ -100,22 +87,21 @@ def montar_matriz_amostras(dataFrame):
 
     print(obj_media)
 
-    # {'PR' : 131341, 'sinal_sala' : -54. 'sinal_quarto': -97 , 'sinal_cozinha: 0'}
 
     print(matrizT)
 
-    dataFrameT =  pd.DataFrame.from_dict(matrizT)
+    dataFrameTreinamento =  pd.DataFrame.from_dict(matrizT)
 
-    print(dataFrameT)
+    print(dataFrameTreinamento)
 
     # gera um arquivo csv com os dados da matriz de treinamento
-    dataFrameT.to_csv('treinamento.csv')
+    dataFrameTreinamento.to_csv('treinamento_leituras_sinal.csv')
 
-    return dataFrameT
+    return dataFrameTreinamento
 
 def executa_knn(dataFrameT):
 
-    X_train, X_test, y_train, y_test = train_test_split(dataFrameT.drop(['PR'], 1), dataFrameT['PR'], test_size=0.3)
+    X_train, X_test, y_train, y_test = train_test_split(dataFrameT.drop(['ponto_referencia'], 1), dataFrameT['ponto_referencia'], test_size=0.3)
 
     print (X_train)
 
