@@ -34,7 +34,7 @@ def montar_matriz_amostras(dataFrame):
     dt_PR_6 =  (dataFrame[ (dataFrame['id_addr']  == 131482)])
     dt_PR_7 =  (dataFrame[ (dataFrame['id_addr']  == 131717)])
 
-    array_dataframes = [dt_PR_1, dt_PR_2, dt_PR_3, dt_PR_4, dt_PR_5, dt_PR_6, dt_PR_7]
+    array_dataframes = [dt_PR_1, dt_PR_2, dt_PR_3, dt_PR_4, dt_PR_5, dt_PR_6, dt_PR_7] # cria um array contendo os dataframes de cada Ponto de Referência
 
     obj_media = { 'sala' :  {'vetor_amostras' : [] , 'vetor_auxiliar' : []} , 'quarto' : {'vetor_amostras' : [], 'vetor_auxiliar' : []}, 'cozinha' : {'vetor_amostras' : [], 'vetor_auxiliar' : []}}
 
@@ -45,23 +45,22 @@ def montar_matriz_amostras(dataFrame):
         tuplas_leitura_sinal = data_frame_pr.itertuples()
 
         tuplas_aux = data_frame_pr.itertuples()
-        test = list(tuplas_aux)
-        data = datetime.strptime(test[0].date_time, "%Y-%m-%d %H:%M:%S.%f")
+        lista_aux = list(tuplas_aux)
+        segundo_atual = (datetime.strptime(lista_aux[0].date_time, "%Y-%m-%d %H:%M:%S.%f")).second # pega os segundos da primeira data do dataframe
 
-        segundo_atual = data.second
 
         for key in obj_media:
             obj_media[key]['vetor_auxiliar'].clear()
 
-        limite_amostras = 0
+        numero_amostras = 0 # tive de inserir um limite de amostras, pois alguns Pontos de Referência tinham menos sinais coletados do que outros
 
         for leitura_sinal in tuplas_leitura_sinal:
 
-            obj_media[leitura_sinal.device_id]['vetor_auxiliar'].append(leitura_sinal.device_signal) # os valores da intensidade de sinal vão sendo armazenados enquanrto não se passa 1 segundo
+            obj_media[leitura_sinal.device_id]['vetor_auxiliar'].append(leitura_sinal.device_signal) # os valores da intensidade de sinal vão sendo armazenados enquanto não se passa 1 segundo
 
-            data = datetime.strptime(leitura_sinal.date_time, "%Y-%m-%d %H:%M:%S.%f")
+            novo_segundo = (datetime.strptime(leitura_sinal.date_time, "%Y-%m-%d %H:%M:%S.%f")).second
 
-            if(data.second > segundo_atual): # se a data subir um minuto, fazer a média dos sinais acumuladas e guardar no array de amostra
+            if(novo_segundo > segundo_atual): # se passar um segundo, a média dos sinais acumuladas é calulada e  guardada no array de amostras
 
                 vetorBi = []
                 
@@ -69,62 +68,53 @@ def montar_matriz_amostras(dataFrame):
                     if(len(obj_media[key]['vetor_auxiliar']) == 0):
                         vetorBi.append(0)
                     else:
-                        vetorBi.append(int( sum(obj_media[key]['vetor_auxiliar']) / len(obj_media[key]['vetor_auxiliar'])) )
+                        vetorBi.append(int( sum(obj_media[key]['vetor_auxiliar']) / len(obj_media[key]['vetor_auxiliar'])) ) # faz a média dos sinais otidos no intervalo de 1 segundo no Ponto de Referência ( depois trocar pelo cálculo dos quartis)
 
                     obj_media[key]['vetor_auxiliar'].clear()
 
                     
-                matrizT.append({'ponto_referencia': leitura_sinal.id_addr, 'sinal_cozinha' : vetorBi[0], 'sinal_sala': vetorBi[1] , 'sinal_quarto': vetorBi[2]  })
+                matrizT.append({'ponto_referencia': leitura_sinal.id_addr, 'sinal_cozinha' : vetorBi[0], 'sinal_sala': vetorBi[1] , 'sinal_quarto': vetorBi[2]  }) # armazena a amostra na matriz de treinamento 
 
-                segundo_atual = data.second
-                limite_amostras +=1
+                segundo_atual = novo_segundo
+                numero_amostras +=1
 
-            if(limite_amostras == 7):
+            if(numero_amostras == 7):
                 break
             
    
 
-
-    print(obj_media)
-
-
-    print(matrizT)
-
-    dataFrameTreinamento =  pd.DataFrame.from_dict(matrizT)
-
-    print(dataFrameTreinamento)
+    dataFrameTreinamento =  pd.DataFrame.from_dict(matrizT) # Cria um novo dataFrame com os valores da Matriz de Treinamento
+    print('                      Dataframe de Treinamento: \n\n\n', dataFrameTreinamento)
 
     # gera um arquivo csv com os dados da matriz de treinamento
     dataFrameTreinamento.to_csv('treinamento_leituras_sinal.csv')
 
     return dataFrameTreinamento
 
-def executa_knn(dataFrameT):
+def executar_knn(dataFrameT):
 
-    X_train, X_test, y_train, y_test = train_test_split(dataFrameT.drop(['ponto_referencia'], 1), dataFrameT['ponto_referencia'], test_size=0.3)
+    X_train, X_test, y_train, y_test = train_test_split(dataFrameT.drop(['ponto_referencia'], 1), dataFrameT['ponto_referencia'], test_size=0.3) 
 
-    print (X_train)
+    print ('\n       Conjunto de Treinamento:   \n\n', X_train)
 
-    print(X_test)
+    print ('\n       Conjunto de Teste:   \n\n', X_test)
+
 
     knn = KNeighborsClassifier(n_neighbors=3) 
 
     print(knn.fit(X_train, y_train))
 
-    # resultado = knn.predict([[43, -51]])
     resultado = knn.predict(X_test)
 
-    # print(resultado)
-
-    print (pd.crosstab(y_test,resultado, rownames=['Real'], colnames=['Predito'], margins=True))
+    print ('\n              Resultado do KNN: \n\n', pd.crosstab(y_test,resultado, rownames=['Real'], colnames=['Predito'], margins=True))
 
 
 
 def main():
 
     dataFrame = abrir_arquivo()
-    dataFrameTreino =  montar_matriz_amostras(dataFrame)
-    executa_knn(dataFrameTreino)
+    dataFrameTreinamento =  montar_matriz_amostras(dataFrame)
+    executar_knn(dataFrameTreinamento)
 
 
 main()
