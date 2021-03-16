@@ -65,7 +65,7 @@ def montar_matriz_amostras(dataFrame):
                 vetorBi = []
                 
                 for key in obj_media:
-                    if(len(obj_media[key]['vetor_auxiliar']) == 0):
+                    if(len(obj_media[key]['vetor_auxiliar']) == 0): #### tartar esse 0 - definir como -95 (ruído de fundo )
                         vetorBi.append(0)
                     else:
                         vetorBi.append(int( sum(obj_media[key]['vetor_auxiliar']) / len(obj_media[key]['vetor_auxiliar'])) ) # faz a média dos sinais otidos no intervalo de 1 segundo no Ponto de Referência ( depois trocar pelo cálculo dos quartis)
@@ -100,7 +100,7 @@ def executar_knn(dataFrameT):
     print ('\n       Conjunto de Teste:   \n\n', X_test)
 
 
-    knn = KNeighborsClassifier(n_neighbors=3) 
+    knn = KNeighborsClassifier(n_neighbors=3)  # como seta
 
     print(knn.fit(X_train, y_train))
 
@@ -118,3 +118,10 @@ def main():
 
 
 main()
+
+
+## tratar o  0 no ponto de sinal, leavndo em conta o ruído (-98 ou -95)
+## separar o dataframe (separaa antes de montar a matriz) pra ter as partes de treinamento e teste
+## alterar o split no dataset de treinamento e teste ( ter o mesmo número de amostras de testes opara cada PR)
+###  calcular a taxa de erro / acerto  por Ponto de referencia apósa execução do knn
+### pegar os dados crus (sem passar pela fase de treinamento) R: (ao invés de usar o critério de  maioria, talvez usar média ponderada ou outra medida ......  )  
