@@ -66,7 +66,7 @@ def montar_matriz_amostras(dataFrame):
                 
                 for key in obj_media:
                     if(len(obj_media[key]['vetor_auxiliar']) == 0): #### tartar esse 0 - definir como -95 (ruído de fundo )
-                        vetorBi.append(0)
+                        vetorBi.append(-98)
                     else:
                         vetorBi.append(int( sum(obj_media[key]['vetor_auxiliar']) / len(obj_media[key]['vetor_auxiliar'])) ) # faz a média dos sinais otidos no intervalo de 1 segundo no Ponto de Referência ( depois trocar pelo cálculo dos quartis)
 
@@ -78,7 +78,7 @@ def montar_matriz_amostras(dataFrame):
                 segundo_atual = novo_segundo
                 numero_amostras +=1
 
-            if(numero_amostras == 7):
+            if(numero_amostras == 10):
                 break
             
    
@@ -93,7 +93,7 @@ def montar_matriz_amostras(dataFrame):
 
 def executar_knn(dataFrameT):
 
-    X_train, X_test, y_train, y_test = train_test_split(dataFrameT.drop(['ponto_referencia'], 1), dataFrameT['ponto_referencia'], test_size=0.3) 
+    X_train, X_test, y_train, y_test = train_test_split(dataFrameT.drop(['ponto_referencia'], 1), dataFrameT['ponto_referencia'], test_size=0.3, random_state=0) 
 
     print ('\n       Conjunto de Treinamento:   \n\n', X_train)
 
@@ -107,6 +107,9 @@ def executar_knn(dataFrameT):
     resultado = knn.predict(X_test)
 
     print ('\n              Resultado do KNN: \n\n', pd.crosstab(y_test,resultado, rownames=['Real'], colnames=['Predito'], margins=True))
+
+
+    print(metrics.classification_report(y_test,resultado,target_names=['131341', '131364', '131402', '131428', '131451', '131482', '131717']))
 
 
 
