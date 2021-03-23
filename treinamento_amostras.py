@@ -60,7 +60,7 @@ def montar_matriz_amostras(dataFrame):
 
             nova_data = datetime.strptime(leitura_sinal.date_time, "%Y-%m-%d %H:%M:%S.%f")
 
-            if((nova_data - data_atual) >= timedelta(minutes=1)): # se passar um segundo, a média dos sinais acumuladas é calulada e  guardada no array de amostras
+            if((nova_data - data_atual) >= timedelta(seconds=1)): # se passar um segundo, a média dos sinais acumuladas é calulada e  guardada no array de amostras
 
                 vetorBi = []
                 
