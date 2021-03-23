@@ -46,7 +46,7 @@ def montar_matriz_amostras(dataFrame):
 
         tuplas_aux = data_frame_pr.itertuples()
         lista_aux = list(tuplas_aux)
-        segundo_atual = (datetime.strptime(lista_aux[0].date_time, "%Y-%m-%d %H:%M:%S.%f")).second # pega os segundos da primeira data do dataframe
+        data_atual = datetime.strptime(lista_aux[0].date_time, "%Y-%m-%d %H:%M:%S.%f") # pega a primeira data do dataframe
 
 
         for key in obj_media:
@@ -58,9 +58,9 @@ def montar_matriz_amostras(dataFrame):
 
             obj_media[leitura_sinal.device_id]['vetor_auxiliar'].append(leitura_sinal.device_signal) # os valores da intensidade de sinal vão sendo armazenados enquanto não se passa 1 segundo
 
-            novo_segundo = (datetime.strptime(leitura_sinal.date_time, "%Y-%m-%d %H:%M:%S.%f")).second
+            nova_data = datetime.strptime(leitura_sinal.date_time, "%Y-%m-%d %H:%M:%S.%f")
 
-            if(novo_segundo > segundo_atual): # se passar um segundo, a média dos sinais acumuladas é calulada e  guardada no array de amostras
+            if((nova_data - data_atual) >= timedelta(minutes=1)): # se passar um segundo, a média dos sinais acumuladas é calulada e  guardada no array de amostras
 
                 vetorBi = []
                 
@@ -75,7 +75,7 @@ def montar_matriz_amostras(dataFrame):
                     
                 matrizT.append({'ponto_referencia': leitura_sinal.id_addr, 'sinal_cozinha' : vetorBi[0], 'sinal_sala': vetorBi[1] , 'sinal_quarto': vetorBi[2]  }) # armazena a amostra na matriz de treinamento 
 
-                segundo_atual = novo_segundo
+                data_atual = nova_data
                 numero_amostras +=1
 
             if(numero_amostras == 10):
