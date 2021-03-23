@@ -93,7 +93,7 @@ def montar_matriz_amostras(dataFrame):
 
 def executar_knn(dataFrameT):
 
-    X_train, X_test, y_train, y_test = train_test_split(dataFrameT.drop(['ponto_referencia'], 1), dataFrameT['ponto_referencia'], test_size=0.3, random_state=0) 
+    X_train, X_test, y_train, y_test = train_test_split(dataFrameT.drop(['ponto_referencia'], 1), dataFrameT['ponto_referencia'], test_size=0.3, stratify= dataFrameT['ponto_referencia']) 
 
     print ('\n       Conjunto de Treinamento:   \n\n', X_train)
 
@@ -123,8 +123,8 @@ def main():
 main()
 
 
-## tratar o  0 no ponto de sinal, leavndo em conta o ruído (-98 ou -95)
+## tratar o  0 no ponto de sinal, leavndo em conta o ruído (-98 ou -95)                                                                                                         X
 ## separar o dataframe (separaa antes de montar a matriz) pra ter as partes de treinamento e teste
-## alterar o split no dataset de treinamento e teste ( ter o mesmo número de amostras de testes opara cada PR)
-###  calcular a taxa de erro / acerto  por Ponto de referencia apósa execução do knn
+## alterar o split no dataset de treinamento e teste ( ter o mesmo número de amostras de testes opara cada PR)                                                                  X
+###  calcular a taxa de erro / acerto  por Ponto de referencia apósa execução do knn                                                                                            X
 ### pegar os dados crus (sem passar pela fase de treinamento) R: (ao invés de usar o critério de  maioria, talvez usar média ponderada ou outra medida ......  )  
