@@ -81,7 +81,7 @@ def montar_matriz_amostras(dataFrame):
                 data_atual = nova_data
                 numero_amostras +=1
 
-            if(numero_amostras == 7 ):
+            if(numero_amostras == 10 ):
                 break
             
     dataFrameTreinamento =  pd.DataFrame.from_dict(matrizT) # Cria um novo dataFrame com os valores da Matriz de Treinamento
@@ -121,14 +121,14 @@ def executar_knn(dataFrameT):
 
     conjunto_teste['acerto'] =  acertos
 
-    print('\n       Resultado no conjunto de teste: \n\n', conjunto_teste)
+    print('\n       Predição do KNN no conjunto de teste: \n\n', conjunto_teste)
 
 
-    print ('\n              Resultado do KNN: \n\n', pd.crosstab(y_test,resultado, rownames=['Real'], colnames=['Predito'], margins=True))
+    print ('\n              Resultado Geral do KNN: \n\n', pd.crosstab(y_test,resultado, rownames=['Real'], colnames=['Predito'], margins=True))
 
     target_names = sorted(y_test.unique())
 
-    print(metrics.classification_report(y_test,resultado,target_names= target_names))
+    print('\n              Métricas de Comparação: \n\n', metrics.classification_report(y_test,resultado,target_names= target_names))
 
 
 
