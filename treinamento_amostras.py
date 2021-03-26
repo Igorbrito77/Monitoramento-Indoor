@@ -110,7 +110,19 @@ def executar_knn(dataFrameT):
 
     conjunto_teste['predicao_knn'] =  resultado
 
+    tuplas = conjunto_teste.itertuples()
+
+    acertos =[] 
+    for tupla in tuplas:
+        if tupla.ponto_referencia == tupla.predicao_knn:
+            acertos.append('V')        
+        else:
+            acertos.append('X')
+
+    conjunto_teste['acerto'] =  acertos
+
     print('\n       Resultado no conjunto de teste: \n\n', conjunto_teste)
+
 
     print ('\n              Resultado do KNN: \n\n', pd.crosstab(y_test,resultado, rownames=['Real'], colnames=['Predito'], margins=True))
 
