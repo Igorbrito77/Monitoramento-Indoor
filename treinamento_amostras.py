@@ -115,9 +115,9 @@ def executar_knn(dataFrameT):
 
     print ('\n              Resultado do KNN: \n\n', pd.crosstab(y_test,resultado, rownames=['Real'], colnames=['Predito'], margins=True))
 
-    print()
+    target_names = sorted(y_test.unique())
 
-    print(metrics.classification_report(y_test,resultado,target_names=['banheiro', 'corredor', 'cozinha', 'quarto1','quarto2', 'quarto3', 'sala']))
+    print(metrics.classification_report(y_test,resultado,target_names= target_names))
 
 
 
