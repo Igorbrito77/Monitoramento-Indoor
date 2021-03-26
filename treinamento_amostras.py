@@ -26,13 +26,16 @@ def abrir_arquivo():
 def montar_matriz_amostras(dataFrame):
 
     ## separa o dataframe em partes, sendo que cada parte corresponde às leituras de sinal correspondentes a um Ponto de Referência específico
-    dt_PR_1 =  (dataFrame[ (dataFrame['id_addr']  == 131341)])
-    dt_PR_2 =  (dataFrame[ (dataFrame['id_addr']  == 131364)])
-    dt_PR_3 =  (dataFrame[ (dataFrame['id_addr']  == 131402)])
-    dt_PR_4 =  (dataFrame[ (dataFrame['id_addr']  == 131428)])
-    dt_PR_5 =  (dataFrame[ (dataFrame['id_addr']  == 131451)])
-    dt_PR_6 =  (dataFrame[ (dataFrame['id_addr']  == 131482)])
-    dt_PR_7 =  (dataFrame[ (dataFrame['id_addr']  == 131717)])
+    dt_PR_1 =  (dataFrame[ (dataFrame['id_addr']  == 131341)]) # quarto2
+    dt_PR_2 =  (dataFrame[ (dataFrame['id_addr']  == 131364)]) # cozinha
+    dt_PR_3 =  (dataFrame[ (dataFrame['id_addr']  == 131402)]) # quarto3
+    dt_PR_4 =  (dataFrame[ (dataFrame['id_addr']  == 131428)]) # sala
+    dt_PR_5 =  (dataFrame[ (dataFrame['id_addr']  == 131451)]) # banheiro
+    dt_PR_6 =  (dataFrame[ (dataFrame['id_addr']  == 131482)]) # quarto1
+    dt_PR_7 =  (dataFrame[ (dataFrame['id_addr']  == 131717)]) # corredor
+
+    nomes_pr = {  131341 : 'quarto2', 131364 : 'cozinha', 131402 : 'quarto3', 131428 : 'sala', 131451 : 'banheiro', 131482 : 'quarto1', 131717 : 'corredor' }
+
 
     array_dataframes = [dt_PR_1, dt_PR_2, dt_PR_3, dt_PR_4, dt_PR_5, dt_PR_6, dt_PR_7] # cria um array contendo os dataframes de cada Ponto de Referência
 
@@ -73,15 +76,17 @@ def montar_matriz_amostras(dataFrame):
                     obj_media[key]['vetor_auxiliar'].clear()
 
                     
-                matrizT.append({'ponto_referencia': leitura_sinal.id_addr, 'sinal_cozinha' : vetorBi[0], 'sinal_sala': vetorBi[1] , 'sinal_quarto': vetorBi[2]  }) # armazena a amostra na matriz de treinamento 
+                # print(leitura_sinal.id_addr, '  ---', nomes_pr[leitura_sinal.id_addr])
+
+                matrizT.append({'ponto_referencia':  nomes_pr[leitura_sinal.id_addr], 'sinal_cozinha' : vetorBi[0], 'sinal_sala': vetorBi[1] , 'sinal_quarto': vetorBi[2]  }) # armazena a amostra na matriz de treinamento 
 
                 data_atual = nova_data
                 numero_amostras +=1
 
-            if(numero_amostras == 50):
+            if(numero_amostras == 7 ):
                 break
             
-   
+    print('matrizT = ', matrizT)
 
     dataFrameTreinamento =  pd.DataFrame.from_dict(matrizT) # Cria um novo dataFrame com os valores da Matriz de Treinamento
     print('                      Dataframe de Treinamento: \n\n\n', dataFrameTreinamento)
@@ -93,7 +98,7 @@ def montar_matriz_amostras(dataFrame):
 
 def executar_knn(dataFrameT):
 
-    X_train, X_test, y_train, y_test = train_test_split(dataFrameT.drop(['ponto_referencia'], 1), dataFrameT['ponto_referencia'], test_size=0.5, stratify= dataFrameT['ponto_referencia']) 
+    X_train, X_test, y_train, y_test = train_test_split(dataFrameT.drop(['ponto_referencia'], 1), dataFrameT['ponto_referencia'],test_size=0.3, stratify= dataFrameT['ponto_referencia']) 
 
     print ('\n       Conjunto de Treinamento:   \n\n', X_train)
 
@@ -106,10 +111,13 @@ def executar_knn(dataFrameT):
 
     resultado = knn.predict(X_test)
 
+    print('resultado \n', resultado)
+
     print ('\n              Resultado do KNN: \n\n', pd.crosstab(y_test,resultado, rownames=['Real'], colnames=['Predito'], margins=True))
 
+    print()
 
-    print(metrics.classification_report(y_test,resultado,target_names=['131341', '131364', '131402', '131428', '131451', '131482', '131717']))
+    print(metrics.classification_report(y_test,resultado,target_names=['banheiro', 'corredor', 'cozinha', 'quarto1','quarto2', 'quarto3', 'sala']))
 
 
 
@@ -128,3 +136,5 @@ main()
 ## alterar o split no dataset de treinamento e teste ( ter o mesmo número de amostras de testes opara cada PR)                                                                  X
 ###  calcular a taxa de erro / acerto  por Ponto de referencia após a execução do knn                                                                                           X
 ### ao invés de usar o critério de  maioria, talvez usar média ponderada ou outra medida ......  )  
+
+
