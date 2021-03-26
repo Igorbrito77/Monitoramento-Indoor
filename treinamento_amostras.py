@@ -85,7 +85,7 @@ def montar_matriz_amostras(dataFrame):
                 break
             
     dataFrameTreinamento =  pd.DataFrame.from_dict(matrizT) # Cria um novo dataFrame com os valores da Matriz de Treinamento
-    print('                      Dataframe de Treinamento: \n\n\n', dataFrameTreinamento)
+    print('                                                             DATAFRAME DE TREINAMENTO: \n\n\n', dataFrameTreinamento)
 
     # gera um arquivo csv com os dados da matriz de treinamento
     dataFrameTreinamento.to_csv('treinamento_leituras_sinal.csv')
@@ -106,7 +106,8 @@ def executar_knn(dataFrameT):
     
     conjunto_teste = pd.DataFrame(X_test)
     conjunto_teste['ponto_referencia'] = y_test 
-    print ('\n       Conjunto de Teste:   \n\n', conjunto_teste)
+    print ('\n____________________________________________________________________________________________________________________________')
+    print ('\n                                                          CONJUNTO DE TESTE   \n\n', conjunto_teste)
 
     conjunto_teste['predicao_knn'] =  resultado
 
@@ -121,14 +122,16 @@ def executar_knn(dataFrameT):
 
     conjunto_teste['acerto'] =  acertos
 
-    print('\n       Predição do KNN no conjunto de teste: \n\n', conjunto_teste)
+    print ('\n____________________________________________________________________________________________________________________________')
+    print('\n                                                       PREDIÇÃO DO KNN NO CONJUNTO DE TESTE \n\n', conjunto_teste)
 
-
-    print ('\n              Resultado Geral do KNN: \n\n', pd.crosstab(y_test,resultado, rownames=['Real'], colnames=['Predito'], margins=True))
+    print ('\n____________________________________________________________________________________________________________________________')
+    print ('\n                                                      RESULTADO GERAL DO KNN \n\n', pd.crosstab(y_test,resultado, rownames=['Real'], colnames=['Predito'], margins=True))
 
     target_names = sorted(y_test.unique())
 
-    print('\n              Métricas de Comparação: \n\n', metrics.classification_report(y_test,resultado,target_names= target_names))
+    print ('\n____________________________________________________________________________________________________________________________')
+    print('\n                                                       MÉTRICAS DE COMPARAÇÃO \n\n', metrics.classification_report(y_test,resultado,target_names= target_names))
 
 
 
