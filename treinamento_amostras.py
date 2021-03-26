@@ -76,8 +76,6 @@ def montar_matriz_amostras(dataFrame):
                     obj_media[key]['vetor_auxiliar'].clear()
 
                     
-                # print(leitura_sinal.id_addr, '  ---', nomes_pr[leitura_sinal.id_addr])
-
                 matrizT.append({'ponto_referencia':  nomes_pr[leitura_sinal.id_addr], 'sinal_cozinha' : vetorBi[0], 'sinal_sala': vetorBi[1] , 'sinal_quarto': vetorBi[2]  }) # armazena a amostra na matriz de treinamento 
 
                 data_atual = nova_data
@@ -86,8 +84,6 @@ def montar_matriz_amostras(dataFrame):
             if(numero_amostras == 7 ):
                 break
             
-    print('matrizT = ', matrizT)
-
     dataFrameTreinamento =  pd.DataFrame.from_dict(matrizT) # Cria um novo dataFrame com os valores da Matriz de Treinamento
     print('                      Dataframe de Treinamento: \n\n\n', dataFrameTreinamento)
 
@@ -100,18 +96,21 @@ def executar_knn(dataFrameT):
 
     X_train, X_test, y_train, y_test = train_test_split(dataFrameT.drop(['ponto_referencia'], 1), dataFrameT['ponto_referencia'],test_size=0.3, stratify= dataFrameT['ponto_referencia']) 
 
-    print ('\n       Conjunto de Treinamento:   \n\n', X_train)
+    # print ('\n       Conjunto de Treinamento:   \n\n', X_train)
 
-    print ('\n       Conjunto de Teste:   \n\n', X_test)
-
-
-    knn = KNeighborsClassifier(n_neighbors=3)  # como seta
+    knn = KNeighborsClassifier(n_neighbors=3)
 
     print(knn.fit(X_train, y_train))
 
     resultado = knn.predict(X_test)
+    
+    conjunto_teste = pd.DataFrame(X_test)
+    conjunto_teste['ponto_referencia'] = y_test 
+    print ('\n       Conjunto de Teste:   \n\n', conjunto_teste)
 
-    print('resultado \n', resultado)
+    conjunto_teste['predicao_knn'] =  resultado
+
+    print('\n       Resultado no conjunto de teste: \n\n', conjunto_teste)
 
     print ('\n              Resultado do KNN: \n\n', pd.crosstab(y_test,resultado, rownames=['Real'], colnames=['Predito'], margins=True))
 
