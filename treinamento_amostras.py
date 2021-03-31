@@ -25,6 +25,11 @@ def abrir_arquivo():
 
 def montar_matriz_amostras(dataFrame):
 
+        # segundos do intervalo, numero de amostras, 
+    
+    numero_amostras = int(input('Insira o número de amostras que serão geradas para cada Ponto de Referência: '))
+    segundos_intervalo = int(input('Insira o número de segundos para a montagem de uma amostra para um Ponto de Referência: '))
+
     ## separa o dataframe em partes, sendo que cada parte corresponde às leituras de sinal correspondentes a um Ponto de Referência específico
     dt_PR_1 =  (dataFrame[ (dataFrame['id_addr']  == 131341)]) # quarto2
     dt_PR_2 =  (dataFrame[ (dataFrame['id_addr']  == 131364)]) # cozinha
@@ -55,7 +60,7 @@ def montar_matriz_amostras(dataFrame):
         for key in obj_media:
             obj_media[key]['vetor_auxiliar'].clear()
 
-        numero_amostras = 0 # tive de inserir um limite de amostras, pois alguns Pontos de Referência tinham menos sinais coletados do que outros
+        cont_amostras = 0 # tive de inserir um limite de amostras, pois alguns Pontos de Referência tinham menos sinais coletados do que outros
 
         for leitura_sinal in tuplas_leitura_sinal:
 
@@ -63,12 +68,12 @@ def montar_matriz_amostras(dataFrame):
 
             nova_data = datetime.strptime(leitura_sinal.date_time, "%Y-%m-%d %H:%M:%S.%f")
 
-            if((nova_data - data_atual) >= timedelta(seconds=1)): # se passar um segundo, a média dos sinais acumuladas é calulada e  guardada no array de amostras
+            if((nova_data - data_atual) >= timedelta(seconds=segundos_intervalo)): # se passar X segundos, a média dos sinais acumuladas é calulada e  guardada no array de amostras
 
                 vetorBi = []
                 
                 for key in obj_media:
-                    if(len(obj_media[key]['vetor_auxiliar']) == 0): #### tartar esse 0 - definir como -95 (ruído de fundo )
+                    if(len(obj_media[key]['vetor_auxiliar']) == 0): #### tartar esse 0 - definir como -98 (ruído de fundo )
                         vetorBi.append(-98)
                     else:
                         vetorBi.append(int( sum(obj_media[key]['vetor_auxiliar']) / len(obj_media[key]['vetor_auxiliar'])) ) # faz a média dos sinais otidos no intervalo de 1 segundo no Ponto de Referência ( depois trocar pelo cálculo dos quartis)
@@ -79,9 +84,9 @@ def montar_matriz_amostras(dataFrame):
                 matrizT.append({'ponto_referencia':  nomes_pr[leitura_sinal.id_addr], 'sinal_cozinha' : vetorBi[0], 'sinal_sala': vetorBi[1] , 'sinal_quarto': vetorBi[2]  }) # armazena a amostra na matriz de treinamento 
 
                 data_atual = nova_data
-                numero_amostras +=1
+                cont_amostras +=1
 
-            if(numero_amostras == 10 ):
+            if(cont_amostras == numero_amostras ):
                 break
             
     dataFrameTreinamento =  pd.DataFrame.from_dict(matrizT) # Cria um novo dataFrame com os valores da Matriz de Treinamento
@@ -94,9 +99,15 @@ def montar_matriz_amostras(dataFrame):
 
 def executar_knn(dataFrameT):
 
-    X_train, X_test, y_train, y_test = train_test_split(dataFrameT.drop(['ponto_referencia'], 1), dataFrameT['ponto_referencia'],test_size=0.3, stratify= dataFrameT['ponto_referencia']) 
+    # aleatoriedade (boolean), partição de testes
+    porcentagem_testes = float(input('Insira a porcentagem de partição de amostras para Teste (exemplo: 0.5 = 50%) : '))
+    
+    aleatoriedade = input('Utilizar aleatoriedade na partição das amostras de testes e treinamento ? (Sim = S, Não = N)  : ')
 
-    # print ('\n       Conjunto de Treinamento:   \n\n', X_train)
+    aleatoriedade = 42 if aleatoriedade == 'S' else None
+
+    X_train, X_test, y_train, y_test = train_test_split(dataFrameT.drop(['ponto_referencia'], 1), dataFrameT['ponto_referencia'],test_size=porcentagem_testes, stratify= dataFrameT['ponto_referencia'], random_state=aleatoriedade) 
+
 
     knn = KNeighborsClassifier(n_neighbors=3)
 
@@ -131,8 +142,11 @@ def executar_knn(dataFrameT):
     target_names = sorted(y_test.unique())
 
     print ('\n____________________________________________________________________________________________________________________________')
-    print('\n                                                       MÉTRICAS DE COMPARAÇÃO \n\n', metrics.classification_report(y_test,resultado,target_names= target_names))
+    print('\n                                                       MÉTRICAS DE COMPARAÇÃO \n\n', metrics.classification_report(y_test,resultado,target_names= target_names, zero_division = 0))
 
+
+
+## segundos do intervalo, numero de amostras, aleatoriedade (boolean), partição de testes, nome do arquivo csv gerado
 
 
 def main():
