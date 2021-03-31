@@ -23,12 +23,8 @@ def abrir_arquivo():
     return dataFrame
 
 
-def montar_matriz_amostras(dataFrame):
+def montar_matriz_amostras(dataFrame, numero_amostras, segundos_intervalo, nome_arquivo_csv):
 
-        # segundos do intervalo, numero de amostras, 
-    
-    numero_amostras = int(input('Insira o número de amostras que serão geradas para cada Ponto de Referência: '))
-    segundos_intervalo = int(input('Insira o número de segundos para a montagem de uma amostra para um Ponto de Referência: '))
 
     ## separa o dataframe em partes, sendo que cada parte corresponde às leituras de sinal correspondentes a um Ponto de Referência específico
     dt_PR_1 =  (dataFrame[ (dataFrame['id_addr']  == 131341)]) # quarto2
@@ -93,21 +89,14 @@ def montar_matriz_amostras(dataFrame):
     print('                                                             DATAFRAME DE TREINAMENTO: \n\n\n', dataFrameTreinamento)
 
     # gera um arquivo csv com os dados da matriz de treinamento
-    dataFrameTreinamento.to_csv('treinamento_leituras_sinal.csv')
+    dataFrameTreinamento.to_csv('leituras_sinal' +  nome_arquivo_csv +'.csv')
 
     return dataFrameTreinamento
 
-def executar_knn(dataFrameT):
+def executar_knn(dataFrameT, porcentagem_testes, aleatoriedade, nome_arquivo_csv):
 
-    # aleatoriedade (boolean), partição de testes
-    porcentagem_testes = float(input('Insira a porcentagem de partição de amostras para Teste (exemplo: 0.5 = 50%) : '))
-    
-    aleatoriedade = input('Utilizar aleatoriedade na partição das amostras de testes e treinamento ? (Sim = S, Não = N)  : ')
-
-    aleatoriedade = 42 if aleatoriedade == 'S' else None
 
     X_train, X_test, y_train, y_test = train_test_split(dataFrameT.drop(['ponto_referencia'], 1), dataFrameT['ponto_referencia'],test_size=porcentagem_testes, stratify= dataFrameT['ponto_referencia'], random_state=aleatoriedade) 
-
 
     knn = KNeighborsClassifier(n_neighbors=3)
 
@@ -145,22 +134,41 @@ def executar_knn(dataFrameT):
     print('\n                                                       MÉTRICAS DE COMPARAÇÃO \n\n', metrics.classification_report(y_test,resultado,target_names= target_names, zero_division = 0))
 
 
-    # cria um dataframe com o report das métricas de classificação
+    # cria um arquivo csv com o report das métricas de classificação
 
     dicionario_report =  metrics.classification_report(y_test,resultado,target_names= target_names, zero_division = 0,  output_dict=True)
     dataFrameReport = pd.DataFrame(dicionario_report).transpose()
-    dataFrameReport.to_csv('report_amostras.csv')
+    dataFrameReport.to_csv('metricas_' + nome_arquivo_csv + '.csv')
 
 
-
-## segundos do intervalo, numero de amostras, aleatoriedade (boolean), partição de testes, nome do arquivo csv gerado
 
 
 def main():
+    
+    nome_arquivo_csv = input('Digite o nome base dos arquivos csv que serão gerados  : ')
+    numero_amostras = int(input('Insira o número de amostras que serão geradas para cada Ponto de Referência: '))
+    segundos_intervalo = int(input('Insira o número de segundos para a montagem de uma amostra para um Ponto de Referência: '))
+
+    porcentagem_testes = 0.0
+    aleatoriedade = 'S'
+
+    while True:
+        porcentagem_testes = float(input('Insira a porcentagem de partição de amostras para Teste (exemplo: 0.5 = 50%) : '))
+        if(porcentagem_testes > 0 and porcentagem_testes <1):
+            break
+
+    while True:
+        aleatoriedade = input('Utilizar aleatoriedade na partição das amostras de testes e treinamento ? (Sim = S, Não = N)  : ')
+        if(aleatoriedade == 'S' or aleatoriedade == 'N'):
+            break
+
+    aleatoriedade = 42 if aleatoriedade == 'S' else None
+    
+
 
     dataFrame = abrir_arquivo()
-    dataFrameTreinamento =  montar_matriz_amostras(dataFrame)
-    executar_knn(dataFrameTreinamento)
+    dataFrameTreinamento =  montar_matriz_amostras(dataFrame, numero_amostras, segundos_intervalo, nome_arquivo_csv )
+    executar_knn(dataFrameTreinamento, porcentagem_testes, aleatoriedade, nome_arquivo_csv)
 
 
 main()
