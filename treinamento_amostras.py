@@ -41,7 +41,7 @@ def montar_matriz_amostras(dataFrame, numero_amostras, segundos_intervalo, nome_
 
     obj_media = { 'sala' :  {'vetor_amostras' : [] , 'vetor_intensidade_sinal' : []} , 'quarto' : {'vetor_amostras' : [], 'vetor_intensidade_sinal' : []}, 'cozinha' : {'vetor_amostras' : [], 'vetor_intensidade_sinal' : []}}
 
-    matrizT = [] # Matriz de treinamento que será formada ao longo da execução do algoritmo
+    matrizT = [] # Matriz de amostras que será formada ao longo da execução do algoritmo
 
     for data_frame_pr in array_dataframes: ## são coletadas as amostras 
 
@@ -66,7 +66,7 @@ def montar_matriz_amostras(dataFrame, numero_amostras, segundos_intervalo, nome_
                 vetorBi = []
                 
                 for key in obj_media:
-                    if(len(obj_media[key]['vetor_intensidade_sinal']) == 0): #### tartar esse 0 - definir como -98 (ruído de fundo )
+                    if(len(obj_media[key]['vetor_intensidade_sinal']) == 0): # Caso não haja nenhum sinal captado no determinado sensor nos X segundos de intervalo, adiciona-se uma amostra de valor -98
                         vetorBi.append(-98)
                     else:
                         vetorBi.append(int( sum(obj_media[key]['vetor_intensidade_sinal']) / len(obj_media[key]['vetor_intensidade_sinal'])) ) # faz a média dos sinais otidos no intervalo de 1 segundo no Ponto de Referência ( depois trocar pelo cálculo dos quartis)
@@ -74,7 +74,7 @@ def montar_matriz_amostras(dataFrame, numero_amostras, segundos_intervalo, nome_
                     obj_media[key]['vetor_intensidade_sinal'].clear()
 
                     
-                matrizT.append({'ponto_referencia':  nomes_pr[leitura_sinal.id_addr], 'sinal_cozinha' : vetorBi[0], 'sinal_sala': vetorBi[1] , 'sinal_quarto': vetorBi[2]  }) # armazena a amostra na matriz de treinamento 
+                matrizT.append({'ponto_referencia':  nomes_pr[leitura_sinal.id_addr], 'sinal_cozinha' : vetorBi[0], 'sinal_sala': vetorBi[1] , 'sinal_quarto': vetorBi[2]  }) # armazena a amostra na matriz de amostras 
 
                 data_atual = nova_data
                 cont_amostras +=1
@@ -82,18 +82,18 @@ def montar_matriz_amostras(dataFrame, numero_amostras, segundos_intervalo, nome_
             if(cont_amostras == numero_amostras ):
                 break
             
-    dataFrameTreinamento =  pd.DataFrame.from_dict(matrizT) # Cria um novo dataFrame com os valores da Matriz de Treinamento
-    print('                                                             DATAFRAME DE TREINAMENTO: \n\n\n', dataFrameTreinamento)
+    dataFrameAmostras =  pd.DataFrame.from_dict(matrizT) # Cria um novo dataFrame com os valores da Matriz de Amostras
+    print('                                                             DATAFRAME DE AMOSTRAS: \n\n\n', dataFrameAmostras)
 
-    # gera um arquivo csv com os dados da matriz de treinamento
-    dataFrameTreinamento.to_csv('leituras_sinal_' +  nome_arquivo_csv +'.csv')
+    # gera um arquivo csv com os dados da matriz de amostras 
+    dataFrameAmostras.to_csv('amostras_' +  nome_arquivo_csv +'.csv')
 
-    return dataFrameTreinamento
+    return dataFrameAmostras
 
-def executar_knn(dataFrameT, porcentagem_testes, aleatoriedade, nome_arquivo_csv):
+def executar_knn(dataFrame, porcentagem_testes, aleatoriedade, nome_arquivo_csv):
 
 
-    X_train, X_test, y_train, y_test = train_test_split(dataFrameT.drop(['ponto_referencia'], 1), dataFrameT['ponto_referencia'],test_size=porcentagem_testes, stratify= dataFrameT['ponto_referencia'], random_state=aleatoriedade) 
+    X_train, X_test, y_train, y_test = train_test_split(dataFrame.drop(['ponto_referencia'], 1), dataFrame['ponto_referencia'],test_size=porcentagem_testes, stratify= dataFrame['ponto_referencia'], random_state=aleatoriedade) 
 
     knn = KNeighborsClassifier(n_neighbors=3)
 
@@ -159,7 +159,7 @@ def main():
     aleatoriedade = 'S'
 
     while True:
-        porcentagem_testes = float(input('Insira a porcentagem de partição de amostras para Teste (exemplo: 0.5 = 50%): '))
+        porcentagem_testes = float(input('Insira a porcentagem de partição de amostras para Teste (exemplo: 0.3 = 30% para teste e 70% para treinamento): '))
         if(porcentagem_testes > 0 and porcentagem_testes <1):
             break
 
@@ -172,8 +172,8 @@ def main():
     
 
     dataFrame = abrir_arquivo()
-    dataFrameTreinamento =  montar_matriz_amostras(dataFrame, numero_amostras, segundos_intervalo, nome_arquivo_csv )
-    executar_knn(dataFrameTreinamento, porcentagem_testes, aleatoriedade, nome_arquivo_csv)
+    dataFrameAmostras =  montar_matriz_amostras(dataFrame, numero_amostras, segundos_intervalo, nome_arquivo_csv )
+    executar_knn(dataFrameAmostras, porcentagem_testes, aleatoriedade, nome_arquivo_csv)
 
 
 main()
