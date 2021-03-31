@@ -145,6 +145,13 @@ def executar_knn(dataFrameT):
     print('\n                                                       MÉTRICAS DE COMPARAÇÃO \n\n', metrics.classification_report(y_test,resultado,target_names= target_names, zero_division = 0))
 
 
+    # cria um dataframe com o report das métricas de classificação
+
+    dicionario_report =  metrics.classification_report(y_test,resultado,target_names= target_names, zero_division = 0,  output_dict=True)
+    dataFrameReport = pd.DataFrame(dicionario_report).transpose()
+    dataFrameReport.to_csv('report_amostras.csv')
+
+
 
 ## segundos do intervalo, numero de amostras, aleatoriedade (boolean), partição de testes, nome do arquivo csv gerado
 
