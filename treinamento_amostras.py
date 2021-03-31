@@ -35,32 +35,29 @@ def montar_matriz_amostras(dataFrame, numero_amostras, segundos_intervalo, nome_
     dt_PR_6 =  (dataFrame[ (dataFrame['id_addr']  == 131482)]) # quarto1
     dt_PR_7 =  (dataFrame[ (dataFrame['id_addr']  == 131717)]) # corredor
 
-    nomes_pr = {  131341 : 'quarto2', 131364 : 'cozinha', 131402 : 'quarto3', 131428 : 'sala', 131451 : 'banheiro', 131482 : 'quarto1', 131717 : 'corredor' }
-
-
     array_dataframes = [dt_PR_1, dt_PR_2, dt_PR_3, dt_PR_4, dt_PR_5, dt_PR_6, dt_PR_7] # cria um array contendo os dataframes de cada Ponto de Referência
 
-    obj_media = { 'sala' :  {'vetor_amostras' : [] , 'vetor_auxiliar' : []} , 'quarto' : {'vetor_amostras' : [], 'vetor_auxiliar' : []}, 'cozinha' : {'vetor_amostras' : [], 'vetor_auxiliar' : []}}
+    nomes_pr = {  131341 : 'quarto2', 131364 : 'cozinha', 131402 : 'quarto3', 131428 : 'sala', 131451 : 'banheiro', 131482 : 'quarto1', 131717 : 'corredor' }
+
+    obj_media = { 'sala' :  {'vetor_amostras' : [] , 'vetor_intensidade_sinal' : []} , 'quarto' : {'vetor_amostras' : [], 'vetor_intensidade_sinal' : []}, 'cozinha' : {'vetor_amostras' : [], 'vetor_intensidade_sinal' : []}}
 
     matrizT = [] # Matriz de treinamento que será formada ao longo da execução do algoritmo
 
     for data_frame_pr in array_dataframes: ## são coletadas as amostras 
 
-        tuplas_leitura_sinal = data_frame_pr.itertuples()
-
         tuplas_aux = data_frame_pr.itertuples()
         lista_aux = list(tuplas_aux)
         data_atual = datetime.strptime(lista_aux[0].date_time, "%Y-%m-%d %H:%M:%S.%f") # pega a primeira data do dataframe
 
-
         for key in obj_media:
-            obj_media[key]['vetor_auxiliar'].clear()
+            obj_media[key]['vetor_intensidade_sinal'].clear()
 
+        tuplas_leitura_sinal = data_frame_pr.itertuples()
         cont_amostras = 0 # tive de inserir um limite de amostras, pois alguns Pontos de Referência tinham menos sinais coletados do que outros
 
         for leitura_sinal in tuplas_leitura_sinal:
 
-            obj_media[leitura_sinal.device_id]['vetor_auxiliar'].append(leitura_sinal.device_signal) # os valores da intensidade de sinal vão sendo armazenados enquanto não se passa 1 segundo
+            obj_media[leitura_sinal.device_id]['vetor_intensidade_sinal'].append(leitura_sinal.device_signal) # os valores da intensidade de sinal vão sendo armazenados enquanto não se passa o intervalo de segundos informado
 
             nova_data = datetime.strptime(leitura_sinal.date_time, "%Y-%m-%d %H:%M:%S.%f")
 
@@ -69,12 +66,12 @@ def montar_matriz_amostras(dataFrame, numero_amostras, segundos_intervalo, nome_
                 vetorBi = []
                 
                 for key in obj_media:
-                    if(len(obj_media[key]['vetor_auxiliar']) == 0): #### tartar esse 0 - definir como -98 (ruído de fundo )
+                    if(len(obj_media[key]['vetor_intensidade_sinal']) == 0): #### tartar esse 0 - definir como -98 (ruído de fundo )
                         vetorBi.append(-98)
                     else:
-                        vetorBi.append(int( sum(obj_media[key]['vetor_auxiliar']) / len(obj_media[key]['vetor_auxiliar'])) ) # faz a média dos sinais otidos no intervalo de 1 segundo no Ponto de Referência ( depois trocar pelo cálculo dos quartis)
+                        vetorBi.append(int( sum(obj_media[key]['vetor_intensidade_sinal']) / len(obj_media[key]['vetor_intensidade_sinal'])) ) # faz a média dos sinais otidos no intervalo de 1 segundo no Ponto de Referência ( depois trocar pelo cálculo dos quartis)
 
-                    obj_media[key]['vetor_auxiliar'].clear()
+                    obj_media[key]['vetor_intensidade_sinal'].clear()
 
                     
                 matrizT.append({'ponto_referencia':  nomes_pr[leitura_sinal.id_addr], 'sinal_cozinha' : vetorBi[0], 'sinal_sala': vetorBi[1] , 'sinal_quarto': vetorBi[2]  }) # armazena a amostra na matriz de treinamento 
@@ -134,7 +131,6 @@ def executar_knn(dataFrameT, porcentagem_testes, aleatoriedade, nome_arquivo_csv
 
 
     # cria um arquivo csv com o report das métricas de classificação
-
     dicionario_report =  metrics.classification_report(y_test,resultado,target_names= target_names, zero_division = 0,  output_dict=True)
     dataFrameReport = pd.DataFrame(dicionario_report).transpose()
     dataFrameReport.to_csv('metricas_' + nome_arquivo_csv + '.csv')
@@ -172,9 +168,8 @@ def main():
         if(aleatoriedade == 'S' or aleatoriedade == 'N'):
             break
 
-    aleatoriedade = 42 if aleatoriedade == 'S' else None
+    aleatoriedade = None if aleatoriedade == 'S' else 42
     
-
 
     dataFrame = abrir_arquivo()
     dataFrameTreinamento =  montar_matriz_amostras(dataFrame, numero_amostras, segundos_intervalo, nome_arquivo_csv )
@@ -182,12 +177,4 @@ def main():
 
 
 main()
-
-
-## tratar o  0 no ponto de sinal, leavndo em conta o ruído (-98 ou -95)                                                                                                         X
-## separar o dataframe (separaa antes de montar a matriz) pra ter as partes de treinamento e teste                                                                              +-
-## alterar o split no dataset de treinamento e teste ( ter o mesmo número de amostras de testes opara cada PR)                                                                  X
-###  calcular a taxa de erro / acerto  por Ponto de referencia após a execução do knn                                                                                           X
-### ao invés de usar o critério de  maioria, talvez usar média ponderada ou outra medida ......  )  
-
 
