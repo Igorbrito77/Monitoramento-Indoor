@@ -89,7 +89,7 @@ def montar_matriz_amostras(dataFrame, numero_amostras, segundos_intervalo, nome_
     print('                                                             DATAFRAME DE TREINAMENTO: \n\n\n', dataFrameTreinamento)
 
     # gera um arquivo csv com os dados da matriz de treinamento
-    dataFrameTreinamento.to_csv('leituras_sinal' +  nome_arquivo_csv +'.csv')
+    dataFrameTreinamento.to_csv('leituras_sinal_' +  nome_arquivo_csv +'.csv')
 
     return dataFrameTreinamento
 
@@ -110,7 +110,6 @@ def executar_knn(dataFrameT, porcentagem_testes, aleatoriedade, nome_arquivo_csv
     print ('\n                                                          CONJUNTO DE TESTE   \n\n', conjunto_teste)
 
     conjunto_teste['predicao_knn'] =  resultado
-
     tuplas = conjunto_teste.itertuples()
 
     acertos =[] 
@@ -146,17 +145,17 @@ def executar_knn(dataFrameT, porcentagem_testes, aleatoriedade, nome_arquivo_csv
 def main():
     
     while True:
-        nome_arquivo_csv = input('Digite o nome base dos arquivos csv que serão gerados  : ')
-        if(nome_arquivo_csv == ''):
+        nome_arquivo_csv = input('Digite o nome base dos arquivos csv que serão gerados: ')
+        if(nome_arquivo_csv != ''):
             break
 
     while True:
-        numero_amostras = int(input('Insira o número de amostras que serão geradas para cada Ponto de Referência: (acima de 0)'))
+        numero_amostras = int(input('Insira o número de amostras que serão geradas para cada Ponto de Referência (acima de 0): '))
         if(numero_amostras > 0):
             break
 
     while True:
-        segundos_intervalo = int(input('Insira o número de segundos para a montagem de uma amostra para um Ponto de Referência: (acima de 0)'))
+        segundos_intervalo = int(input('Insira o número de segundos para a montagem de uma amostra para um Ponto de Referência (acima de 0): '))
         if(segundos_intervalo > 0):
             break
 
@@ -164,12 +163,12 @@ def main():
     aleatoriedade = 'S'
 
     while True:
-        porcentagem_testes = float(input('Insira a porcentagem de partição de amostras para Teste (exemplo: 0.5 = 50%) : '))
+        porcentagem_testes = float(input('Insira a porcentagem de partição de amostras para Teste (exemplo: 0.5 = 50%): '))
         if(porcentagem_testes > 0 and porcentagem_testes <1):
             break
 
     while True:
-        aleatoriedade = input('Utilizar aleatoriedade na partição das amostras de testes e treinamento ? (Sim = S, Não = N)  : ')
+        aleatoriedade = input('Utilizar aleatoriedade na partição das amostras de testes e treinamento ? (Sim = S, Não = N)  ')
         if(aleatoriedade == 'S' or aleatoriedade == 'N'):
             break
 
