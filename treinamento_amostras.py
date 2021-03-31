@@ -145,9 +145,20 @@ def executar_knn(dataFrameT, porcentagem_testes, aleatoriedade, nome_arquivo_csv
 
 def main():
     
-    nome_arquivo_csv = input('Digite o nome base dos arquivos csv que serão gerados  : ')
-    numero_amostras = int(input('Insira o número de amostras que serão geradas para cada Ponto de Referência: '))
-    segundos_intervalo = int(input('Insira o número de segundos para a montagem de uma amostra para um Ponto de Referência: '))
+    while True:
+        nome_arquivo_csv = input('Digite o nome base dos arquivos csv que serão gerados  : ')
+        if(nome_arquivo_csv == ''):
+            break
+
+    while True:
+        numero_amostras = int(input('Insira o número de amostras que serão geradas para cada Ponto de Referência: (acima de 0)'))
+        if(numero_amostras > 0):
+            break
+
+    while True:
+        segundos_intervalo = int(input('Insira o número de segundos para a montagem de uma amostra para um Ponto de Referência: (acima de 0)'))
+        if(segundos_intervalo > 0):
+            break
 
     porcentagem_testes = 0.0
     aleatoriedade = 'S'
