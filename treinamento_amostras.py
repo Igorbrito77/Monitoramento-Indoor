@@ -1,3 +1,4 @@
+import sys
 import pandas as pd 
 import numpy as np
 from datetime import datetime, timedelta
@@ -139,34 +140,34 @@ def executar_knn(dataFrameT, porcentagem_testes, aleatoriedade, nome_arquivo_csv
 
 
 def main():
-    
-    while True:
-        nome_arquivo_csv = input('Digite o nome base dos arquivos csv que serão gerados: ')
-        if(nome_arquivo_csv != ''):
-            break
 
-    while True:
-        numero_amostras = int(input('Insira o número de amostras que serão geradas para cada Ponto de Referência (acima de 0): '))
-        if(numero_amostras > 0):
-            break
+    nome_arquivo_csv = sys.argv[1]
+    numero_amostras =  int(sys.argv[2])
+    segundos_intervalo = int(sys.argv[3])
+    porcentagem_testes = float(sys.argv[4]) 
+    aleatoriedade =  sys.argv[5]
 
-    while True:
-        segundos_intervalo = int(input('Insira o número de segundos para a montagem de uma amostra para um Ponto de Referência (acima de 0): '))
-        if(segundos_intervalo > 0):
-            break
+    # print(numero_amostras)
 
-    porcentagem_testes = 0.0
-    aleatoriedade = 'S'
+    if(numero_amostras <= 0):
+        sys.exit("Age less than 18")    
 
-    while True:
-        porcentagem_testes = float(input('Insira a porcentagem de partição de amostras para Teste (exemplo: 0.5 = 50%): '))
-        if(porcentagem_testes > 0 and porcentagem_testes <1):
-            break
+    # if(numero_amostras >= 0):
+    #     break
 
-    while True:
-        aleatoriedade = input('Utilizar aleatoriedade na partição das amostras de testes e treinamento ? (Sim = S, Não = N)  ')
-        if(aleatoriedade == 'S' or aleatoriedade == 'N'):
-            break
+    # if(segundos_intervalo > 0):
+    #     break
+
+    # porcentagem_testes = 0.0
+    # aleatoriedade = 'S'
+
+    # float(input('Insira a porcentagem de partição de amostras para Teste (exemplo: 0.5 = 50%): '))
+    # if(porcentagem_testes < 0 or porcentagem_testes >1):
+    #     break
+
+    #  input('Utilizar aleatoriedade na partição das amostras de testes e treinamento ? (Sim = S, Não = N)  ')
+    # if(aleatoriedade != 'S' and aleatoriedade != 'N'):
+        # break
 
     aleatoriedade = None if aleatoriedade == 'S' else 42
     
