@@ -9,6 +9,8 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import train_test_split
 from sklearn import metrics
 from sklearn.model_selection import GridSearchCV
+import matplotlib.pyplot as plt
+from mlxtend.plotting import plot_decision_regions
 
 
 def abrir_arquivo():
@@ -36,9 +38,14 @@ def montar_matriz_amostras(dataFrame, numero_amostras, segundos_intervalo, nome_
     dt_PR_6 =  (dataFrame[ (dataFrame['id_addr']  == 131482)]) # quarto1
     dt_PR_7 =  (dataFrame[ (dataFrame['id_addr']  == 131717)]) # corredor
 
+    # print('quarto2 --------------> \n ', dt_PR_1)
+
+
     array_dataframes = [dt_PR_1, dt_PR_2, dt_PR_3, dt_PR_4, dt_PR_5, dt_PR_6, dt_PR_7] # cria um array contendo os dataframes de cada Ponto de Referência
 
     nomes_pr = {  131341 : 'quarto2', 131364 : 'cozinha', 131402 : 'quarto3', 131428 : 'sala', 131451 : 'banheiro', 131482 : 'quarto1', 131717 : 'corredor' }
+
+    num_pr = {  131341 : 0, 131364 : 1, 131402 : 2, 131428 : 3, 131451 : 4, 131482 : 5, 131717 : 6 }
 
     obj_media = { 'sala' :  {'vetor_amostras' : [] , 'vetor_intensidade_sinal' : []} , 'quarto' : {'vetor_amostras' : [], 'vetor_intensidade_sinal' : []}, 'cozinha' : {'vetor_amostras' : [], 'vetor_intensidade_sinal' : []}}
 
@@ -75,7 +82,7 @@ def montar_matriz_amostras(dataFrame, numero_amostras, segundos_intervalo, nome_
                     obj_media[key]['vetor_intensidade_sinal'].clear()
 
                     
-                matrizT.append({'ponto_referencia':  nomes_pr[leitura_sinal.id_addr], 'sinal_cozinha' : vetorBi[0], 'sinal_sala': vetorBi[1] , 'sinal_quarto': vetorBi[2]  }) # armazena a amostra na matriz de treinamento 
+                matrizT.append({'ponto_referencia':  nomes_pr[leitura_sinal.id_addr], 'num_pr': num_pr[leitura_sinal.id_addr],  'sinal_cozinha' : vetorBi[0], 'sinal_sala': vetorBi[1] , 'sinal_quarto': vetorBi[2]  }) # armazena a amostra na matriz de treinamento 
 
                 data_atual = nova_data
                 cont_amostras +=1
@@ -84,7 +91,7 @@ def montar_matriz_amostras(dataFrame, numero_amostras, segundos_intervalo, nome_
                 break
             
     dataFrameTreinamento =  pd.DataFrame.from_dict(matrizT) # Cria um novo dataFrame com os valores da Matriz de Treinamento
-    print('                                                             DATAFRAME DE TREINAMENTO: \n\n\n', dataFrameTreinamento)
+    # print('                                                             DATAFRAME DE TREINAMENTO: \n\n\n', dataFrameTreinamento)
 
     # gera um arquivo csv com os dados da matriz de treinamento
     dataFrameTreinamento.to_csv('leituras_sinal_' +  nome_arquivo_csv +'.csv')
@@ -93,48 +100,88 @@ def montar_matriz_amostras(dataFrame, numero_amostras, segundos_intervalo, nome_
 
 def executar_knn(dataFrameT, porcentagem_testes, aleatoriedade, nome_arquivo_csv):
 
+    dataFrameT = dataFrameT.drop(['ponto_referencia'], 1)
 
-    X_train, X_test, y_train, y_test = train_test_split(dataFrameT.drop(['ponto_referencia'], 1), dataFrameT['ponto_referencia'],test_size=porcentagem_testes, stratify= dataFrameT['ponto_referencia'], random_state=aleatoriedade) 
+    print(dataFrameT)
+
+    X_train, X_test, y_train, y_test = train_test_split(dataFrameT.drop(['num_pr'], 1), dataFrameT['num_pr'],test_size=porcentagem_testes, stratify= dataFrameT['num_pr'], random_state=aleatoriedade) 
 
     knn = KNeighborsClassifier(n_neighbors=3)
 
     print(knn.fit(X_train, y_train))
 
-    resultado = knn.predict(X_test)
+    # print(X_train)
+
+
+    # X = X_train[:,[0,2]]
+    # X = X_train
+
+    print(X_train.to_numpy())
+
+    X = X_train.to_numpy()
+    X = X[:,[0,2]]
+
+
+
+    y = y_train.to_numpy()
+
+    print(y)
+
+
+    # print( wine.target_names)
+    # print(y)
+
+    knn = KNeighborsClassifier(n_neighbors=1)
+    knn.fit(X, y)
+    plt.figure(figsize=(8,5))
+    plot_decision_regions(X,y,clf=knn,legend=2)
+    plt.xlabel('alcohol')
+    plt.ylabel('malic_acid')
+    plt.title('Fronteiras de Complexidade - KNN')
+
+    plt.show()
+
+
+
+
+
+
+
+    # resultado = knn.predict(X_test)
     
-    conjunto_teste = pd.DataFrame(X_test)
-    conjunto_teste['ponto_referencia'] = y_test 
-    print ('\n____________________________________________________________________________________________________________________________')
-    print ('\n                                                          CONJUNTO DE TESTE   \n\n', conjunto_teste)
+    # conjunto_teste = pd.DataFrame(X_test)
+    # conjunto_teste['ponto_referencia'] = y_test 
+    # print ('\n____________________________________________________________________________________________________________________________')
+    # print ('\n                                                          CONJUNTO DE TESTE   \n\n', conjunto_teste)
 
-    conjunto_teste['predicao_knn'] =  resultado
-    tuplas = conjunto_teste.itertuples()
+    # conjunto_teste['predicao_knn'] =  resultado
+    # tuplas = conjunto_teste.itertuples()
 
-    acertos =[] 
-    for tupla in tuplas:
-        if tupla.ponto_referencia == tupla.predicao_knn:
-            acertos.append('V')        
-        else:
-            acertos.append('X')
+    # acertos =[] 
+    # for tupla in tuplas:
+    #     if tupla.ponto_referencia == tupla.predicao_knn:
+    #         acertos.append('V')        
+    #     else:
+    #         acertos.append('X')
 
-    conjunto_teste['acerto'] =  acertos
+    # conjunto_teste['acerto'] =  acertos
 
-    print ('\n____________________________________________________________________________________________________________________________')
-    print('\n                                                       PREDIÇÃO DO KNN NO CONJUNTO DE TESTE \n\n', conjunto_teste)
+    # print ('\n____________________________________________________________________________________________________________________________')
+    # print('\n                                                       PREDIÇÃO DO KNN NO CONJUNTO DE TESTE \n\n', conjunto_teste)
 
-    print ('\n____________________________________________________________________________________________________________________________')
-    print ('\n                                                      RESULTADO GERAL DO KNN \n\n', pd.crosstab(y_test,resultado, rownames=['Real'], colnames=['Predito'], margins=True))
+    # print ('\n____________________________________________________________________________________________________________________________')
+    # print ('\n                                                      RESULTADO GERAL DO KNN \n\n', pd.crosstab(y_test,resultado, rownames=['Real'], colnames=['Predito'], margins=True))
 
-    target_names = sorted(y_test.unique())
+    # target_names = sorted(y_test.unique())
 
-    print ('\n____________________________________________________________________________________________________________________________')
-    print('\n                                                       MÉTRICAS DE COMPARAÇÃO \n\n', metrics.classification_report(y_test,resultado,target_names= target_names, zero_division = 0))
+    # print ('\n____________________________________________________________________________________________________________________________')
+    # print('\n                                                       MÉTRICAS DE COMPARAÇÃO \n\n', metrics.classification_report(y_test,resultado,target_names= target_names, zero_division = 0))
 
 
-    # cria um arquivo csv com o report das métricas de classificação
-    dicionario_report =  metrics.classification_report(y_test,resultado,target_names= target_names, zero_division = 0,  output_dict=True)
-    dataFrameReport = pd.DataFrame(dicionario_report).transpose()
-    dataFrameReport.to_csv('metricas_' + nome_arquivo_csv + '.csv')
+    # # cria um arquivo csv com o report das métricas de classificação
+    # dicionario_report =  metrics.classification_report(y_test,resultado,target_names= target_names, zero_division = 0,  output_dict=True)
+    # dataFrameReport = pd.DataFrame(dicionario_report).transpose()
+    # dataFrameReport.to_csv('metricas_' + nome_arquivo_csv + '.csv')
 
 
 
