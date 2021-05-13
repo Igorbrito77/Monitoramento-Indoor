@@ -18,7 +18,7 @@ Implementação de um programa que gera pacotes com endereço MAC forjado para a
 
 ### Execução da geração de pacotes
 
-* Executar o arquivo script.py : **python script.py**
+* Executar o arquivo script_coleta.py : **python script_coleta.py**
 
 ### Execução da geração de pacotes com interface gráfica
 
