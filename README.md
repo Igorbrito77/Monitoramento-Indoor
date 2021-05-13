@@ -1,6 +1,6 @@
 # Monitoramento-Indoor
 
-Implementação de um programa que gera pacotes com endereço MAC forjado para a captção de sinais dos Pontos de Acesso de um ambiente fechado visando facilitar a fase de treinamento seguinte.
+Implementação de um programa responsável por realizar uma coleta automatizada de assinaturas de RSSI. Tal ferramenta será utilizada durante a execução da faseo ffline do Wi-Fifingerprint,criando uma base de dados com instâncias previamente classificadas de RSSI que futuramente será utilizada para efetuar a localização na fase online. Este auxílio na fase offline contribuirá com o processo de criação de sistemas de localização indoor que façam uso de tal técnica, ajudando na popularização dos sistemas de localização indoor.
 
 
 ## Execução 
@@ -16,15 +16,19 @@ Implementação de um programa que gera pacotes com endereço MAC forjado para a
 * Religar o wifi caso tenha sido desligado ao ativar o modo monitor:  **/etc/init.d/network-manager restart**
 * Encerrar o modo monitor na placa wireless : **airmon-ng stop nome_da_placa_wireless_em_modo_monitor**
 
-### Execução da geração de pacotes
+### Execução do script de geração de pacotes para a montagem da base de dados
 
 * Executar o arquivo script_coleta.py : **python script_coleta.py**
 
+### Execução do script de validação da base de dados gerada com o script anterior
+
+* Executar o arquivo script_coleta.py : **python script_validacao.py**
+
 ### Execução da geração de pacotes com interface gráfica
 
-* Executar o arquivo script.py : **python interface.py**
+* Executar o arquivo interface.py : **python interface.py**
 
 
 ## Teste da geração de pacotes
 
-* Executar o arquivo pacotes_beacon.py : **python pacotes_beacon.py**
+* Executar o arquivo geracao_pacotes.py : **python geracao_pacotes.py**
